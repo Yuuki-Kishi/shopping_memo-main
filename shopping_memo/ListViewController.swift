@@ -294,11 +294,41 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     func deleteRoom() {
         if connect {
             self.ref.child("rooms").child(self.roomIdString).child("members").observeSingleEvent(of: .value, with: { [self] snapshot in
-                let memberCount = Int(snapshot.childrenCount) 
+                let memberCount = Int(snapshot.childrenCount)
                 if memberCount == 1 {
                     let alert: UIAlertController = UIAlertController(title: "本当に削除しますか？", message: "この操作を取り消すことはできません。", preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "削除", style: .destructive, handler: { action in
+                        GeneralPurpose.AIV(VC: self, view: self.view, status: "start")
                         self.isWithdrawal = true
+                        for list in self.listArray {
+                            let roomId = self.roomIdString!
+                            let listId = list.listId
+                            let imageRef = Storage.storage().reference().child("/\(roomId)/\(listId)")
+                            imageRef.listAll(completion: { (StorageListResult, error) in
+                                if let error = error {
+                                    print("エラー\(error)")
+                                } else {
+                                    if StorageListResult?.items.count == 0 {
+                                        self.ref.child("rooms").child(self.roomIdString).child("lists").child(listId).removeValue()
+                                        GeneralPurpose.updateEditHistory(roomId: self.roomIdString)
+                                        GeneralPurpose.AIV(VC: self, view: self.view, status: "stop")
+                                    } else {
+                                        for ref in StorageListResult!.items {
+                                            ref.delete { (error) in
+                                                if let error = error {
+                                                    print(error)
+                                                } else {
+                                                    print("succeed")
+                                                }
+                                            }
+                                        }
+                                        self.ref.child("rooms").child(self.roomIdString).child("lists").child(listId).removeValue()
+                                        GeneralPurpose.updateEditHistory(roomId: self.roomIdString)
+                                        GeneralPurpose.AIV(VC: self, view: self.view, status: "stop")
+                                    }
+                                }
+                            })
+                        }
                         self.ref.child("rooms").child(self.roomIdString).child("members").observe(.childAdded, with: { snapshot in
                             let userId = snapshot.key
                             self.ref.child("users").child(userId).child("rooms").child(self.roomIdString).removeValue()
@@ -327,22 +357,40 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
             let roomId = roomIdString!
             // 削除処理
             deleteAction = UIContextualAction(style: .destructive, title: "削除") { (action, view, completionHandler) in
+                GeneralPurpose.AIV(VC: self, view: self.view, status: "start")
                 //削除処理を記述
                 self.listArray.remove(at: indexPath.section)
                 let imageRef = Storage.storage().reference().child("/\(roomId)/\(listId)")
-//                if imageRef != nil {
-                    imageRef.delete { error in
-                        if let error = error {
-                            print(error)
-                        } else {
+                imageRef.listAll(completion: { (StorageListResult, error) in
+                    if let error = error {
+                        print("エラー\(error)")
+                    } else {
+                        if StorageListResult?.items.count == 0 {
                             self.ref.child("rooms").child(self.roomIdString).child("lists").child(listId).removeValue()
                             GeneralPurpose.updateEditHistory(roomId: self.roomIdString)
+                            GeneralPurpose.AIV(VC: self, view: self.view, status: "stop")
+                            let indexSet = NSMutableIndexSet()
+                            indexSet.add(indexPath.section)
+                            tableView.deleteSections(indexSet as IndexSet, with: UITableView.RowAnimation.left)
+                        } else {
+                            for ref in StorageListResult!.items {
+                                ref.delete { (error) in
+                                    if let error = error {
+                                        print(error)
+                                    } else {
+                                        print("succeed")
+                                    }
+                                }
+                            }
+                            self.ref.child("rooms").child(self.roomIdString).child("lists").child(listId).removeValue()
+                            GeneralPurpose.updateEditHistory(roomId: self.roomIdString)
+                            GeneralPurpose.AIV(VC: self, view: self.view, status: "stop")
                             let indexSet = NSMutableIndexSet()
                             indexSet.add(indexPath.section)
                             tableView.deleteSections(indexSet as IndexSet, with: UITableView.RowAnimation.left)
                         }
                     }
-//                }
+                })
                 // 実行結果に関わらず記述
                 completionHandler(true)
             }

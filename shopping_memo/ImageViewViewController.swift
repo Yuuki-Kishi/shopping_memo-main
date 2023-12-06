@@ -184,7 +184,7 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
         guard let roomId = roomIdString else { return }
         guard let listId = listIdString else { return }
         guard let memoId = memoIdString else { return }
-        let imageRef = Storage.storage().reference().child("/\(uid)/\(roomId)/\(listId)/\(memoId).jpg")
+        let imageRef = Storage.storage().reference().child("/\(roomId)/\(listId)/\(memoId).jpg")
         imageRef.putData(imageData, metadata: nil) { (metadata, error) in
             if let error = error {
                 print(error)

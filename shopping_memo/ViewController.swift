@@ -127,9 +127,15 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
                     let date = dateFormatter.date(from: dateNow)
                     let time = dateFormatter.date(from: checkedTime)
                     if isChecked {
-                        self.checkedArray.append((memoId: memoId, memoCount: memoCount, checkedCount: checkedCount, shoppingMemo: shoppingMemo, isChecked: isChecked, dateNow: date!, checkedTime: time!, imageUrl: imageUrl))
+                        let isContain = checkedArray.contains(where: {$0.memoId == memoId})
+                        if !isContain {
+                            self.checkedArray.append((memoId: memoId, memoCount: memoCount, checkedCount: checkedCount, shoppingMemo: shoppingMemo, isChecked: isChecked, dateNow: date!, checkedTime: time!, imageUrl: imageUrl))
+                        }
                     } else {
-                        self.memoArray.append((memoId: memoId, memoCount: memoCount, checkedCount: checkedCount, shoppingMemo: shoppingMemo, isChecked: isChecked, dateNow: date!, checkedTime: time!, imageUrl: imageUrl))
+                        let isContain = memoArray.contains(where: {$0.memoId == memoId})
+                        if !isContain {
+                            self.memoArray.append((memoId: memoId, memoCount: memoCount, checkedCount: checkedCount, shoppingMemo: shoppingMemo, isChecked: isChecked, dateNow: date!, checkedTime: time!, imageUrl: imageUrl))
+                        }
                     }
                     if memos == memoArray.count + checkedArray.count { GeneralPurpose.AIV(VC: self, view: view, status: "stop") }
                     sort()
