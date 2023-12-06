@@ -29,10 +29,6 @@ class MemberViewController: UIViewController, UITableViewDelegate, UITableViewDa
         setUp()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        observeRealtimeDatabase()
-    }
-    
     func setUp() {
         title = "メンバー"
         plusButton.layer.cornerRadius = 35.0
@@ -43,8 +39,10 @@ class MemberViewController: UIViewController, UITableViewDelegate, UITableViewDa
         connectedRef.observe(.value, with: { snapshot in
             if snapshot.value as? Bool ?? false {
                 self.connect = true
+                self.observeRealtimeDatabase()
             } else {
                 self.connect = false
+                GeneralPurpose.notConnectAlert(VC: self)
             }
         })
     }
@@ -54,7 +52,7 @@ class MemberViewController: UIViewController, UITableViewDelegate, UITableViewDa
         userId = Auth.auth().currentUser?.uid
         
         ref.child("rooms").child(roomIdString).child("members").observe(.childAdded, with: { [self] snapshot in
-            GeneralPurpose.AIV(VC: self, view: view, status: "start", session: "get")
+            GeneralPurpose.AIV(VC: self, view: view, status: "start")
             let userId = snapshot.key
             ref.child("rooms").child(roomIdString).child("members").observeSingleEvent(of: .value, with: { [self] snapshot in
                 let userCount = snapshot.childrenCount
@@ -82,7 +80,7 @@ class MemberViewController: UIViewController, UITableViewDelegate, UITableViewDa
                         }
                         if myAuthority != "administrator" { plusButton.isHidden = true }
                         if userCount == administratorArray.count + memberArray.count + guestArray.count {
-                            GeneralPurpose.AIV(VC: self, view: view, status: "stop", session: "get")
+                            GeneralPurpose.AIV(VC: self, view: view, status: "stop")
                         }
                         tableView.reloadData()
                     })
@@ -347,35 +345,39 @@ class MemberViewController: UIViewController, UITableViewDelegate, UITableViewDa
         let alert: UIAlertController = UIAlertController(title: "メンバーを追加", message: "メンバーを追加する方法を選択してください。", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
         alert.addAction(UIAlertAction(title: "QRコード", style: .default, handler: { action in
-                    self.performSegue(withIdentifier: "toQRCRVC", sender: true)
-                }))
+            GeneralPurpose.segue(VC: self, id: "toQRCRVC", connect: self.connect)
+        }))
         alert.addAction(UIAlertAction(title: "手入力", style: .default, handler: { action in
-                    self.handyPlus()
-                }))
+            self.handyPlus()
+        }))
         self.present(alert, animated: true, completion: nil)
     }
     
     func handyPlus() {
-        var alertTextField: UITextField!
-        let alert: UIAlertController = UIAlertController(title: "メンバーを追加", message: "追加したい人のユーザーIDを入力してください。", preferredStyle: .alert)
-        alert.addTextField { textField in
-            alertTextField = textField
-            alertTextField.clearButtonMode = UITextField.ViewMode.always
-            alertTextField.returnKeyType = .done
-            alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
-            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
-                if alertTextField.text != "" {
-                    let text = alertTextField.text
-                    var trueId = false
-                    self.ref.child("users").child(text!).child("metadata").observeSingleEvent(of: .value, with: { [self] snapshot in
-                        guard let email = snapshot.childSnapshot(forPath: "email").value as? String else { self.afterAddAlert(trueId: trueId); return }
-                        ref.child("rooms").child(roomIdString).child("members").child(text!).updateChildValues(["authority": "guest", "email": email])
-                        ref.child("users").child(text!).child("rooms").updateChildValues(["\(roomIdString!)": "guest"])
-                        trueId = true
-                        self.afterAddAlert(trueId: trueId)
-                    })
-                }}))}
-        self.present(alert, animated: true, completion: nil)
+        if connect {
+            var alertTextField: UITextField!
+            let alert: UIAlertController = UIAlertController(title: "メンバーを追加", message: "追加したい人のユーザーIDを入力してください。", preferredStyle: .alert)
+            alert.addTextField { textField in
+                alertTextField = textField
+                alertTextField.clearButtonMode = UITextField.ViewMode.always
+                alertTextField.returnKeyType = .done
+                alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
+                    if alertTextField.text != "" {
+                        let text = alertTextField.text
+                        var trueId = false
+                        self.ref.child("users").child(text!).child("metadata").observeSingleEvent(of: .value, with: { [self] snapshot in
+                            guard let email = snapshot.childSnapshot(forPath: "email").value as? String else { self.afterAddAlert(trueId: trueId); return }
+                            ref.child("rooms").child(roomIdString).child("members").child(text!).updateChildValues(["authority": "guest", "email": email])
+                            ref.child("users").child(text!).child("rooms").updateChildValues(["\(roomIdString!)": "guest"])
+                            trueId = true
+                            self.afterAddAlert(trueId: trueId)
+                        })
+                    }}))}
+            self.present(alert, animated: true, completion: nil)
+        } else {
+            GeneralPurpose.notConnectAlert(VC: self)
+        }
     }
     
     func afterAddAlert(trueId: Bool) {

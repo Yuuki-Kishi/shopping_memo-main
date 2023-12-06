@@ -84,15 +84,17 @@ class SigninViewController: UIViewController, ASAuthorizationControllerDelegate,
     }
     
     @IBAction func signInGoogle() {
-        googleSignIn()
+        if connect { googleSignIn() }
+        else { GeneralPurpose.notConnectAlert(VC: self) }
     }
     
     @IBAction func relay() {
-        self.performSegue(withIdentifier: "toRelayVC", sender: nil)
+        GeneralPurpose.segue(VC: self, id: "toRelayVC", connect: connect)
     }
     
     @objc func signInApple(_ sender: ASAuthorizationAppleIDButton) {
-        startSignInWithAppleFlow()
+        if connect { startSignInWithAppleFlow() }
+        else { GeneralPurpose.notConnectAlert(VC: self) }
     }
     
     func googleSignIn() {
@@ -208,7 +210,7 @@ class SigninViewController: UIViewController, ASAuthorizationControllerDelegate,
                 self.performSegue(withIdentifier: "toNSVC", sender: nil)
             })])
         let delete = UIAction(title: "アカウント削除", image: UIImage(systemName: "person.badge.minus"), attributes: .destructive, handler: { _ in
-            self.performSegue(withIdentifier: "toRLIVC", sender: nil)
+            GeneralPurpose.segue(VC: self, id: "toRLIVC", connect: self.connect)
         })
         let menu = UIMenu(title: "", image: UIImage(systemName: "ellipsis.circle"), options: .displayInline, children: [Item, delete])
         menuBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "ellipsis.circle"), menu: menu)

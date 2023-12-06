@@ -33,10 +33,6 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
         setUpData()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        observeRealtimeDatabase()
-    }
-    
     func UISetUp() {
         title = shoppingMemoName
         upDateLabel.layer.cornerRadius = 5.0
@@ -50,8 +46,10 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
         connectedRef.observe(.value, with: { snapshot in
             if snapshot.value as? Bool ?? false {
                 self.connect = true
+                self.observeRealtimeDatabase()
             } else {
                 self.connect = false
+                GeneralPurpose.notConnectAlert(VC: self)
             }
         })
     }
@@ -61,7 +59,7 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
         userId = Auth.auth().currentUser?.uid
         
         ref.child("rooms").child(roomIdString).child("lists").child(listIdString).child("memo").child(memoIdString).child("imageUrl").observeSingleEvent(of: .value, with:  { [self] snapshot in
-            GeneralPurpose.AIV(VC: self, view: view, status: "start", session: "get")
+            GeneralPurpose.AIV(VC: self, view: view, status: "start")
             if snapshot.value == nil {
                 return
             }
@@ -73,7 +71,7 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
                 imageView.preferredSymbolConfiguration = .init(pointSize: 100)
                 imageView.tintColor = UIColor.label
                 upDateLabel.text = " 最終更新日時:"
-                GeneralPurpose.AIV(VC: self, view: self.view, status: "stop", session: "get")
+                GeneralPurpose.AIV(VC: self, view: self.view, status: "stop")
             } else {
                 imageRef = storage.reference(forURL: url)
                 imageRef.getData(maxSize: 1 * 1024 * 1024) { data, error in
@@ -82,7 +80,7 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
                     } else {
                         let image = UIImage(data: data!)
                         self.imageView.contentMode = .scaleAspectFit
-                        GeneralPurpose.AIV(VC: self, view: self.view, status: "stop", session: "get")
+                        GeneralPurpose.AIV(VC: self, view: self.view, status: "stop")
                         self.imageView.image = image
                     }
                 }
@@ -103,13 +101,13 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
         }
         
         ref.child("rooms").child(roomIdString).child("lists").child(listIdString).child("memo").observe(.childChanged, with: { [self] snapshot in
-            GeneralPurpose.AIV(VC: self, view: view, status: "start", session: "get")
+            GeneralPurpose.AIV(VC: self, view: view, status: "start")
             guard let url = snapshot.childSnapshot(forPath: "imageUrl").value as? String else { return }
             menu(url: url)
             if url == "" {
                 imageView.contentMode = .center
                 imageView.preferredSymbolConfiguration = .init(pointSize: 100)
-                GeneralPurpose.AIV(VC: self, view: view, status: "stop", session: "get")
+                GeneralPurpose.AIV(VC: self, view: view, status: "stop")
                 imageView.image = UIImage(systemName: "photo")
                 imageView.tintColor = UIColor.label
                 upDateLabel.text = " 最終更新日時:"
@@ -121,7 +119,7 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
                     } else {
                         let image = UIImage(data: data!)
                         self.imageView.contentMode = .scaleAspectFit
-                        GeneralPurpose.AIV(VC: self, view: self.view, status: "stop", session: "get")
+                        GeneralPurpose.AIV(VC: self, view: self.view, status: "stop")
                         self.imageView.image = image
                     }
                 }
@@ -221,11 +219,11 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
     func openAlbum() {
         if connect {
             if UIImagePickerController.isSourceTypeAvailable(.photoLibrary) {
-                GeneralPurpose.AIV(VC: self, view: view, status: "start", session: "other")
+                GeneralPurpose.AIV(VC: self, view: view, status: "start")
                 let picker = UIImagePickerController()
                 picker.sourceType = .photoLibrary
                 picker.delegate = self
-                GeneralPurpose.AIV(VC: self, view: view, status: "stop", session: "other")
+                GeneralPurpose.AIV(VC: self, view: view, status: "stop")
                 present(picker, animated: true, completion: nil)
             }
         } else {
@@ -242,7 +240,7 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
         if connect {
             let alert: UIAlertController = UIAlertController(title: "画像を削除", message: "画像を削除してもよろしいですか。", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "削除", style: .destructive, handler: { action in
-                GeneralPurpose.AIV(VC: self, view: self.view, status: "start", session: "other")
+                GeneralPurpose.AIV(VC: self, view: self.view, status: "start")
                 imageRef.delete { error in
                     if let error = error {
                         print(error)

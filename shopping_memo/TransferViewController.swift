@@ -16,6 +16,7 @@ class TransferViewController: UIViewController, UITableViewDelegate, UITableView
     var userId: String!
     var dateFormatter = DateFormatter()
     var roomIdString: String!
+    var connect = false
     
     var administratorArray = [(uId: String, userName: String, authority: String, email: String)]()
     var memberArray = [(uId: String, userName: String, authority: String, email: String)]()
@@ -23,15 +24,24 @@ class TransferViewController: UIViewController, UITableViewDelegate, UITableView
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        UISetUp()
+        UISetUpAndData()
         obserbeRealtimeDatabase()
     }
     
-    func UISetUp() {
+    func UISetUpAndData() {
         title = "管理者権限を譲渡"
         tableView.register(UINib(nibName: "SettingTableViewCell", bundle: nil), forCellReuseIdentifier: "SettingTableViewCell")
         tableView.delegate = self
         tableView.dataSource = self
+        let connectedRef = Database.database().reference(withPath: ".info/connected")
+        connectedRef.observe(.value, with: { snapshot in
+            if snapshot.value as? Bool ?? false {
+                self.connect = true
+            } else {
+                self.connect = false
+                GeneralPurpose.notConnectAlert(VC: self)
+            }
+        })
     }
     
     func obserbeRealtimeDatabase() {
@@ -39,7 +49,7 @@ class TransferViewController: UIViewController, UITableViewDelegate, UITableView
         userId = Auth.auth().currentUser?.uid
         
         ref.child("rooms").child(roomIdString).child("members").observe(.childAdded, with: { [self] snapshot in
-            GeneralPurpose.AIV(VC: self, view: view, status: "start", session: "get")
+            GeneralPurpose.AIV(VC: self, view: view, status: "start")
             let userId = snapshot.key
             ref.child("rooms").child(roomIdString).child("members").observeSingleEvent(of: .value, with: { [self] snapshot in
                 let userCount = snapshot.childrenCount
@@ -56,7 +66,7 @@ class TransferViewController: UIViewController, UITableViewDelegate, UITableView
                             administratorArray.append((uId: userId, userName: userName, authority: authority, email: email))
                         }
                         if userCount == administratorArray.count + memberArray.count + guestArray.count {
-                            GeneralPurpose.AIV(VC: self, view: view, status: "stop", session: "get")
+                            GeneralPurpose.AIV(VC: self, view: view, status: "stop")
                             if memberArray.isEmpty { noMemberAlert() }
                         }
                         tableView.reloadData()
@@ -225,19 +235,23 @@ class TransferViewController: UIViewController, UITableViewDelegate, UITableView
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.section == 1 {
-            let alert: UIAlertController = UIAlertController(title: "本当に管理者権限を譲渡しますか？", message: "再度権限を得るには保持者に譲渡してもらう必要があります。", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
-            alert.addAction(UIAlertAction(title: "譲渡", style: .destructive, handler: { _ in
-                let oldHolder = self.administratorArray[indexPath.row].uId
-                let newHolder = self.memberArray[indexPath.row].uId
-                self.ref.child("rooms").child(self.roomIdString!).child("members").child(oldHolder).updateChildValues(["authority": "member"])
-                self.ref.child("users").child(oldHolder).child("rooms").updateChildValues([self.roomIdString!: "member"])
-                self.ref.child("rooms").child(self.roomIdString!).child("members").child(newHolder).updateChildValues(["authority": "administrator"])
-                self.ref.child("users").child(newHolder).child("rooms").updateChildValues([self.roomIdString!: "administrator"])
-                self.navigationController?.popViewController(animated: true)
-            }))
-            self.present(alert, animated: true, completion: nil)
+        if connect {
+            if indexPath.section == 1 {
+                let alert: UIAlertController = UIAlertController(title: "本当に管理者権限を譲渡しますか？", message: "再度権限を得るには保持者に譲渡してもらう必要があります。", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
+                alert.addAction(UIAlertAction(title: "譲渡", style: .destructive, handler: { _ in
+                    let oldHolder = self.administratorArray[indexPath.row].uId
+                    let newHolder = self.memberArray[indexPath.row].uId
+                    self.ref.child("rooms").child(self.roomIdString!).child("members").child(oldHolder).updateChildValues(["authority": "member"])
+                    self.ref.child("users").child(oldHolder).child("rooms").updateChildValues([self.roomIdString!: "member"])
+                    self.ref.child("rooms").child(self.roomIdString!).child("members").child(newHolder).updateChildValues(["authority": "administrator"])
+                    self.ref.child("users").child(newHolder).child("rooms").updateChildValues([self.roomIdString!: "administrator"])
+                    self.navigationController?.popViewController(animated: true)
+                }))
+                self.present(alert, animated: true, completion: nil)
+            }
+        } else {
+            GeneralPurpose.notConnectAlert(VC: self)
         }
     }
 }

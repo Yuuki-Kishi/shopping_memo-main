@@ -46,11 +46,9 @@ extension WatchViewModel: WCSessionDelegate {
                 }
                 self.listName = listName
                 self.isLink = true
-                print("5")
                 self.watchDelegate?.reloadData()
                 if notice == "sendData" {
                     let messages: [String : Any] = ["request": "getData"]
-                    print("5")
                     session.sendMessage(messages, replyHandler: nil) { (error) in
                         print("error:", error.localizedDescription)
                     }

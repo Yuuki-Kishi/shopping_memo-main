@@ -20,6 +20,7 @@ class SettingViewController: UIViewController, UITableViewDelegate, UITableViewD
     var sectionArray = ["自分の情報", "設定"]
     var rowArray = [(Item: String, ItemData: String)]()
     var settingArray = [(Item: String, ItemData: String)]()
+    var connect = false
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,13 +36,24 @@ class SettingViewController: UIViewController, UITableViewDelegate, UITableViewD
         
         tableView.delegate = self
         tableView.dataSource = self
+        
+        let connectedRef = Database.database().reference(withPath: ".info/connected")
+        connectedRef.observe(.value, with: { snapshot in
+            if snapshot.value as? Bool ?? false {
+                self.connect = true
+                self.setUpAndObserveRealtimeDatabase()
+            } else {
+                self.connect = false
+                GeneralPurpose.notConnectAlert(VC: self)
+            }
+        })
     }
     
     func setUpAndObserveRealtimeDatabase() {
         ref = Database.database().reference()
         userId = Auth.auth().currentUser?.uid
         
-        GeneralPurpose.AIV(VC: self, view: view, status: "start", session: "get")
+        GeneralPurpose.AIV(VC: self, view: view, status: "start")
         dateFormatter.dateFormat = "yyyy/MM/dd"
         let email = Auth.auth().currentUser?.email
         let create = Auth.auth().currentUser?.metadata.creationDate
@@ -59,7 +71,7 @@ class SettingViewController: UIViewController, UITableViewDelegate, UITableViewD
             rowArray.append((Item: "最終ログイン日", ItemData: lastSignInDate))
             rowArray.append((Item: "運用日数", ItemData: String(operationDays) + "日目"))
             settingArray.append((Item: "メモを見てるときスリープしない", ItemData: ""))
-            if rowArray.count == 7 { GeneralPurpose.AIV(VC: self, view: view, status: "stop", session: "get") }
+            if rowArray.count == 7 { GeneralPurpose.AIV(VC: self, view: view, status: "stop") }
             tableView.reloadData()
         })
         

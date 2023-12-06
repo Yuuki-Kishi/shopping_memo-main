@@ -357,46 +357,6 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         }
     }
     
-    //カメラを反転
-//    func reverseCameraPosition() {
-//        self.captureSession.stopRunning()
-//        self.captureSession.inputs.forEach { input in
-//            self.captureSession.removeInput(input)
-//        }
-//        self.captureSession.outputs.forEach { output in
-//            self.captureSession.removeOutput(output)
-//        }
-//        
-//        // prepare new camera preview
-//        let newCameraPosition: AVCaptureDevice.Position = self.videoDevice?.position == .front ? .back : .front
-//        self.setupCaptureSession(withPosition: newCameraPosition)
-//        let newVideoLayer: AVCaptureVideoPreviewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession!)
-//        newVideoLayer.frame = self.view.bounds
-//        newVideoLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
-//        
-//        // horizontal flip
-//        UIView.transition(with: self.view, duration: 1.0, options: [.transitionFlipFromLeft], animations: nil, completion: { _ in
-//            // replace camera preview with new one
-//            self.view.layer.replaceSublayer(self.previewLayer!, with: newVideoLayer)
-//            self.previewLayer = newVideoLayer
-//        })
-//    }
-    
-//    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-//        imageView.contentMode = .scaleAspectFit
-//        imageView.image = info[.originalImage] as? UIImage
-//        dismiss(animated: true, completion: nil)
-//    }
-//    
-//    func openCamera() {
-//        if UIImagePickerController.isSourceTypeAvailable(.camera) {
-//            let imagePicker = UIImagePickerController()
-//            imagePicker.sourceType = .camera
-//            imagePicker.delegate = self
-//            present(imagePicker, animated: true)
-//        }
-//    }
-    
     @objc func uploadBarButtonItem(_ sender: UIBarButtonItem) {
         if connect {
             guard let image = imageView.image else { return }
@@ -405,7 +365,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
                 alert.addAction(UIAlertAction(title: "OK", style: .default))
                 self.present(alert, animated: true)
             } else {
-                GeneralPurpose.AIV(VC: self, view: view, status: "start", session: "post")
+                GeneralPurpose.AIV(VC: self, view: view, status: "start")
                 guard let imageData = image.jpegData(compressionQuality: 0.3) else { return }
                 guard let uid = userId else { return }
                 guard let roomId = roomIdString else { return }
@@ -435,3 +395,4 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         self.dismiss(animated: true, completion: nil)
     }
 }
+//

@@ -31,57 +31,20 @@ class GeneralPurpose {
         ref.child("rooms").child(roomId).child("info").updateChildValues(["lastEditTime": timeNow, "lastEditor": editor!])
     }
     
-    static func AIV(VC: UIViewController, view: UIView, status: String, session: String) {
+    static func AIV(VC: UIViewController, view: UIView, status: String) {
         if status == "start" {
             AIV.center = view.center
             AIV.style = .large
             AIV.color = .label
             view.addSubview(AIV)
             AIV.startAnimating()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 30.0) {
-                if AIV.isAnimating && session != "other" {
-                    AIV.stopAnimating()
-                    switch session {
-                    case "get":
-                        let alert: UIAlertController = UIAlertController(title: "低速すぎるネットワーク", message: "情報を取得できませんでした。", preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: "OK", style: .default))
-                        VC.present(alert, animated: true)
-                    case "post":
-                        let alert: UIAlertController = UIAlertController(title: "低速すぎるネットワーク", message: "情報をアップロードできませんでした。", preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: "OK", style: .default))
-                        VC.present(alert, animated: true)
-                    case "signIn":
-                        let alert: UIAlertController = UIAlertController(title: "低速すぎるネットワーク", message: "ログインできませんでした。", preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: "OK", style: .default))
-                        VC.present(alert, animated: true)
-                    case "signUp":
-                        let alert: UIAlertController = UIAlertController(title: "低速すぎるネットワーク", message: "新規登録できませんでした。", preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: "OK", style: .default))
-                        VC.present(alert, animated: true)
-                    case "signOut":
-                        let alert: UIAlertController = UIAlertController(title: "低速すぎるネットワーク", message: "ログアウトできませんでした。", preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: "OK", style: .default))
-                        VC.present(alert, animated: true)
-                    case "send":
-                        let alert: UIAlertController = UIAlertController(title: "低速すぎるネットワーク", message: "メールを送信できませんでした。", preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: "OK", style: .default))
-                        VC.present(alert, animated: true)
-                    default:
-                        break
-                    }
-                }
-            }
         } else if status == "stop" {
             AIV.stopAnimating()
         }
     }
     
-    static func noItemLabel(view: UIView) {
-        let titleLabel = UILabel() // ラベルの生成
-        titleLabel.frame = CGRect(x: 0, y: 100, width: UIScreen.main.bounds.size.width, height: 44) // 位置とサイズの指定
-        titleLabel.textAlignment = NSTextAlignment.center // 横揃えの設定
-        titleLabel.text = "表示できる項目がありません" // テキストの設定
-        titleLabel.textColor = UIColor.label // テキストカラーの設定
-        view.addSubview(titleLabel) // ラベルの追加
+    static func segue(VC: UIViewController, id: String, connect: Bool) {
+        if connect { VC.performSegue(withIdentifier: id, sender: nil) }
+        else { notConnectAlert(VC: VC) }
     }
 }

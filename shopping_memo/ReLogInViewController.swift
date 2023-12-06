@@ -58,11 +58,13 @@ class ReLogInViewController: UIViewController, ASAuthorizationControllerDelegate
     }
     
     @IBAction func signInGoogle() {
-        googleSignIn()
+        if connect { googleSignIn() }
+        else { GeneralPurpose.notConnectAlert(VC: self) }
     }
     
     @objc func signInApple(_ sender: ASAuthorizationAppleIDButton) {
-        startSignInWithAppleFlow()
+        if connect { startSignInWithAppleFlow() }
+        else { GeneralPurpose.notConnectAlert(VC: self) }
     }
     
     func googleSignIn() {

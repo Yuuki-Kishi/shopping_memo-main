@@ -23,6 +23,7 @@
 		DE26EAF729E12BFA007AEC11 /* SettingTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE26EAF529E12BFA007AEC11 /* SettingTableViewCell.xib */; };
 		DE27F7C225735A3D007250EE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DE27F7C125735A3D007250EE /* GoogleService-Info.plist */; };
 		DE28F6E2261F270D0074934D /* NotSigninViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE28F6E1261F270D0074934D /* NotSigninViewController.swift */; };
+		DE2F02A72B1C5B4E00AB5ACF /* GuideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2F02A62B1C5B4E00AB5ACF /* GuideViewController.swift */; };
 		DE3DB8292AFB8EAD0032274F /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE3DB8282AFB8EAD0032274F /* CameraViewController.swift */; };
 		DE3DB82F2B0240FE0032274F /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = DE3DB82E2B0240FE0032274F /* GoogleSignIn */; };
 		DE3DB8312B0240FE0032274F /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = DE3DB8302B0240FE0032274F /* GoogleSignInSwift */; };
@@ -124,6 +125,7 @@
 		DE26EAF529E12BFA007AEC11 /* SettingTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingTableViewCell.xib; sourceTree = "<group>"; };
 		DE27F7C125735A3D007250EE /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		DE28F6E1261F270D0074934D /* NotSigninViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotSigninViewController.swift; sourceTree = "<group>"; };
+		DE2F02A62B1C5B4E00AB5ACF /* GuideViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuideViewController.swift; sourceTree = "<group>"; };
 		DE3DB8282AFB8EAD0032274F /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
 		DE3DB82A2AFCA9590032274F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Main.strings; sourceTree = "<group>"; };
 		DE3DB82B2AFCA95A0032274F /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -248,6 +250,7 @@
 				DEEB540E2AB2091D00ACC49A /* QRCodeReadViewController.swift */,
 				DEEB54102AB34AE300ACC49A /* AddMemberViewController.swift */,
 				DEEB54062AAFFC3500ACC49A /* SettingViewController.swift */,
+				DE2F02A62B1C5B4E00AB5ACF /* GuideViewController.swift */,
 				DE59AB192B0B923A00023948 /* RelayViewController.swift */,
 				DE74EA6A2A19BD5600C87A7E /* ReLogInViewController.swift */,
 				DE74EA6C2A19BD9F00C87A7E /* DeleteViewController.swift */,
@@ -596,6 +599,7 @@
 				DEEB53FF2AAD99CE00ACC49A /* iPhoneViewModel.swift in Sources */,
 				DEEB540C2AB1F1B900ACC49A /* ImageTableViewCell.swift in Sources */,
 				DEEB54072AAFFC3500ACC49A /* SettingViewController.swift in Sources */,
+				DE2F02A72B1C5B4E00AB5ACF /* GuideViewController.swift in Sources */,
 				DE74EA6D2A19BD9F00C87A7E /* DeleteViewController.swift in Sources */,
 				DEEB54042AAF370C00ACC49A /* RoomTableViewCell.swift in Sources */,
 				DEEB540F2AB2091D00ACC49A /* QRCodeReadViewController.swift in Sources */,
@@ -734,7 +738,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -790,7 +794,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;

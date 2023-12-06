@@ -524,6 +524,22 @@
             </objects>
             <point key="canvasLocation" x="-473" y="-650"/>
         </scene>
+        <!--Guide View Controller-->
+        <scene sceneID="nWO-sO-0OP">
+            <objects>
+                <viewController id="Ey2-jX-qeF" customClass="GuideViewController" customModule="shopping_memo" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8r4-O6-ryM">
+                        <rect key="frame" x="0.0" y="0.0" width="430" height="932"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="x2e-WS-Cty"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <navigationItem key="navigationItem" id="xJn-tL-7u8"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="h5q-ky-Oig" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="409" y="-650"/>
+        </scene>
         <!--Signin View Controller-->
         <scene sceneID="CrK-nt-hUG">
             <objects>
@@ -674,9 +690,10 @@
                     <connections>
                         <outlet property="noCellLabel" destination="bE3-0N-iuA" id="ukt-05-Tbf"/>
                         <outlet property="plusButton" destination="avc-zS-KZy" id="c5a-YU-k6I"/>
-                        <outlet property="tableView" destination="r70-tg-Kne" id="T3S-yu-pkd"/>
+                        <outlet property="tableView" destination="r70-tg-Kne" id="Z4M-a5-hjH"/>
                         <segue destination="Iq7-hd-tQL" kind="show" identifier="toLVC" id="XW6-RX-1Rw"/>
                         <segue destination="2vp-Nc-kj9" kind="show" identifier="toSVC" id="pOZ-YF-IkU"/>
+                        <segue destination="Ey2-jX-qeF" kind="show" identifier="toGVC" id="MSE-GG-Fw3"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ISv-gb-jV1" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -886,10 +903,10 @@
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="txU-sY-2fI" customClass="Cell">
-                                        <rect key="frame" x="20" y="55.333332061767578" width="390" height="43.666667938232422"/>
+                                        <rect key="frame" x="20" y="55.333332061767578" width="390" height="44.666667938232422"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="txU-sY-2fI" id="U1H-0B-YzJ">
-                                            <rect key="frame" x="0.0" y="0.0" width="390" height="43.666667938232422"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="390" height="44.666667938232422"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
                                     </tableViewCell>

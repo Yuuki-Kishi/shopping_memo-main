@@ -32,7 +32,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
     var shoppingMemoName: String!
     var imageUrlString: String!
     
-    @IBOutlet var menuButton: UIButton!
     var ref: DatabaseReference!
     var menuBarButtonItem: UIBarButtonItem!
     var viewModel = iPhoneViewModel()
@@ -54,12 +53,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
         self.view.endEditing(true)
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        observeRealtimeDatabase()
-        if userDefaults.bool(forKey: "notSleepSwitch") { UIApplication.shared.isIdleTimerDisabled = true }
-    }
-    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         UIApplication.shared.isIdleTimerDisabled = false
@@ -71,14 +64,17 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
         checkedSortInt = userDefaults.integer(forKey: "checkedSortInt")
         checkedSwitch = userDefaults.bool(forKey: "checkedSwitch")
         userDefaults.set(linking, forKey: "linking")
+        if userDefaults.bool(forKey: "notSleepSwitch") { UIApplication.shared.isIdleTimerDisabled = true }
         titleTextField.delegate = self
         viewModel.iPhoneDelegate = self
         let connectedRef = Database.database().reference(withPath: ".info/connected")
         connectedRef.observe(.value, with: { snapshot in
             if snapshot.value as? Bool ?? false {
                 self.connect = true
+                self.observeRealtimeDatabase()
             } else {
                 self.connect = false
+                GeneralPurpose.notConnectAlert(VC: self)
             }
         })
     }
@@ -107,7 +103,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
         checkedArray = []
         
         ref.child("rooms").child(roomIdString).child("lists").child(listIdString).child("memo").observe(.childAdded, with: { [self] snapshot in
-            GeneralPurpose.AIV(VC: self, view: view, status: "start", session: "get")
+            GeneralPurpose.AIV(VC: self, view: view, status: "start")
             let memoId = snapshot.key // memo0とか
             ref.child("rooms").child(roomIdString).child("lists").child(listIdString).child("memo").observeSingleEvent(of: .value, with: { [self] snapshot in
                 let memos = Int(snapshot.childrenCount)
@@ -129,7 +125,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
                     } else {
                         self.memoArray.append((memoId: memoId, memoCount: memoCount, checkedCount: checkedCount, shoppingMemo: shoppingMemo, isChecked: isChecked, dateNow: date!, checkedTime: time!, imageUrl: imageUrl))
                     }
-                    if memos == memoArray.count + checkedArray.count { GeneralPurpose.AIV(VC: self, view: view, status: "stop", session: "get") }
+                    if memos == memoArray.count + checkedArray.count { GeneralPurpose.AIV(VC: self, view: view, status: "stop") }
                     sort()
                 })
             })
@@ -629,16 +625,15 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
             let alert: UIAlertController = UIAlertController(title: "Apple Watchとの通信を切断しますか？", message: "再度利用するには再度接続する必要があります。", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "切断", style: .destructive, handler: { anction in
                 self.sendMessage(notice: "clear")
-                GeneralPurpose.AIV(VC: self, view: self.view, status: "start", session: "other")
+                GeneralPurpose.AIV(VC: self, view: self.view, status: "start")
             }))
             alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
             self.present(alert, animated: true, completion: nil)
         } else {
             let alert: UIAlertController = UIAlertController(title: "Apple Watchは接続されていますか？", message: "このデバイスに接続されていないとデータを送ることができません。", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { anction in
-                print("1")
                 self.sendMessage(notice: "sendData")
-                GeneralPurpose.AIV(VC: self, view: self.view, status: "start", session: "other")
+                GeneralPurpose.AIV(VC: self, view: self.view, status: "start")
             }))
             alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
             self.present(alert, animated: true, completion: nil)
@@ -647,11 +642,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
     
     //MARK: - sendMessage
     func sendMessage(notice: String) {
-        print("2")
         if notice == "sendData" || notice == "reloadData" {
-            print("3")
             let messages: [String: Any] = ["notice": notice, "listName": self.listNameString!, "memoId": self.memoArray.map {$0.memoId}, "shoppingMemo": self.memoArray.map {$0.shoppingMemo}, "imageUrl": self.memoArray.map {$0.imageUrl}]
-            print("4")
             self.viewModel.session.sendMessage(messages, replyHandler: nil) { (error) in
                 print("error:", error.localizedDescription)
             }
@@ -667,7 +659,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
         self.linking = true
         self.userDefaults.set(self.linking, forKey: "linking")
         menu()
-        GeneralPurpose.AIV(VC: self, view: self.view, status: "stop", session: "other")
+        GeneralPurpose.AIV(VC: self, view: self.view, status: "stop")
         let alert: UIAlertController = UIAlertController(title: "Apple Watchと接続しました", message: "画面を移動すると接続は切断されます。", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         self.present(alert, animated: true, completion: nil)
@@ -677,7 +669,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
         self.linking = false
         self.userDefaults.set(self.linking, forKey: "linking")
         menu()
-        GeneralPurpose.AIV(VC: self, view: self.view, status: "stop", session: "other")
+        GeneralPurpose.AIV(VC: self, view: self.view, status: "stop")
         let alert: UIAlertController = UIAlertController(title: "Apple Watchとの通信を切断しました", message: "再度使用するには再度接続してください。", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         self.present(alert, animated: true, completion: nil)
@@ -868,32 +860,28 @@ extension ViewController: checkMarkDelegete {
 extension ViewController: imageButtonDelegate {
     func buttonTapped(indexPath: IndexPath) {
         print("⤴️buttonTapped成功!")
-        if connect {
-            if table.numberOfSections == 2 {
-                if indexPath.section == 0 {
-                    self.memoIdString = memoArray[indexPath.row].memoId
-                    self.shoppingMemoName = memoArray[indexPath.row].shoppingMemo
-                    self.imageUrlString = memoArray[indexPath.row].imageUrl
-                } else {
-                    self.memoIdString = checkedArray[indexPath.row].memoId
-                    self.shoppingMemoName = checkedArray[indexPath.row].shoppingMemo
-                    self.imageUrlString = checkedArray[indexPath.row].imageUrl
-                }
-            } else if table.numberOfSections == 1 {
-                if self.checkedArray.isEmpty {
-                    self.memoIdString = memoArray[indexPath.row].memoId
-                    self.shoppingMemoName = memoArray[indexPath.row].shoppingMemo
-                    self.imageUrlString = memoArray[indexPath.row].imageUrl
-                } else if self.memoArray.isEmpty {
-                    self.memoIdString = checkedArray[indexPath.row].memoId
-                    self.shoppingMemoName = checkedArray[indexPath.row].shoppingMemo
-                    self.imageUrlString = checkedArray[indexPath.row].imageUrl
-                }
+        if table.numberOfSections == 2 {
+            if indexPath.section == 0 {
+                self.memoIdString = memoArray[indexPath.row].memoId
+                self.shoppingMemoName = memoArray[indexPath.row].shoppingMemo
+                self.imageUrlString = memoArray[indexPath.row].imageUrl
+            } else {
+                self.memoIdString = checkedArray[indexPath.row].memoId
+                self.shoppingMemoName = checkedArray[indexPath.row].shoppingMemo
+                self.imageUrlString = checkedArray[indexPath.row].imageUrl
             }
-            self.performSegue(withIdentifier: "toIVVC", sender: nil)
-        } else {
-            GeneralPurpose.notConnectAlert(VC: self)
+        } else if table.numberOfSections == 1 {
+            if self.checkedArray.isEmpty {
+                self.memoIdString = memoArray[indexPath.row].memoId
+                self.shoppingMemoName = memoArray[indexPath.row].shoppingMemo
+                self.imageUrlString = memoArray[indexPath.row].imageUrl
+            } else if self.memoArray.isEmpty {
+                self.memoIdString = checkedArray[indexPath.row].memoId
+                self.shoppingMemoName = checkedArray[indexPath.row].shoppingMemo
+                self.imageUrlString = checkedArray[indexPath.row].imageUrl
+            }
         }
+        GeneralPurpose.segue(VC: self, id: "toIVVC", connect: self.connect)
     }
 }
 

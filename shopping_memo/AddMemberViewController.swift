@@ -20,21 +20,26 @@ class AddMemberViewController: UIViewController, UITableViewDelegate, UITableVie
     var email: String!
     var userName: String!
     var roomIdString: String!
+    var connect = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "メンバーを追加"
-        
         navigationItem.hidesBackButton = true
-        
         tableView.register(UINib(nibName: "SettingTableViewCell", bundle: nil), forCellReuseIdentifier: "SettingTableViewCell")
-        
         tableView.delegate = self
         tableView.dataSource = self
-        
         addButton.layer.cornerRadius = 18.0
-                
-        setUpAndObserveRealtimeDatabase()
+        let connectedRef = Database.database().reference(withPath: ".info/connected")
+        connectedRef.observe(.value, with: { snapshot in
+            if snapshot.value as? Bool ?? false {
+                self.connect = true
+                self.setUpAndObserveRealtimeDatabase()
+            } else {
+                self.connect = false
+                GeneralPurpose.notConnectAlert(VC: self)
+            }
+        })
     }
     
     func setUpAndObserveRealtimeDatabase() {
@@ -102,18 +107,22 @@ class AddMemberViewController: UIViewController, UITableViewDelegate, UITableVie
     }
     
     @IBAction func add() {
-        let alert: UIAlertController = UIAlertController(title: "本当にこのユーザーを招待しますか？", message: "後から招待したユーザーをルームから追放することができます。", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
-            self.ref.child("users").child(self.userIdString!).child("metadata").observeSingleEvent(of: .value, with: { [self] snapshot in
-                let email = snapshot.childSnapshot(forPath: "email").value as! String
-                ref.child("rooms").child(roomIdString!).child("members").child(userIdString!).updateChildValues(["authority": "guest", "email": email])
-                ref.child("users").child(userIdString!).child("rooms").updateChildValues([roomIdString!: "guest"])
-                let viewControllers = self.navigationController?.viewControllers
-                self.navigationController?.popToViewController(viewControllers![viewControllers!.count - 3], animated: true)
-            })
-        }))
-        alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
-        self.present(alert, animated: true, completion: nil)
+        if connect {
+            let alert: UIAlertController = UIAlertController(title: "本当にこのユーザーを招待しますか？", message: "後から招待したユーザーをルームから追放することができます。", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
+                self.ref.child("users").child(self.userIdString!).child("metadata").observeSingleEvent(of: .value, with: { [self] snapshot in
+                    let email = snapshot.childSnapshot(forPath: "email").value as! String
+                    ref.child("rooms").child(roomIdString!).child("members").child(userIdString!).updateChildValues(["authority": "guest", "email": email])
+                    ref.child("users").child(userIdString!).child("rooms").updateChildValues([roomIdString!: "guest"])
+                    let viewControllers = self.navigationController?.viewControllers
+                    self.navigationController?.popToViewController(viewControllers![viewControllers!.count - 3], animated: true)
+                })
+            }))
+            alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
+            self.present(alert, animated: true, completion: nil)
+        } else {
+            GeneralPurpose.notConnectAlert(VC: self)
+        }
     }
     
     @IBAction func cancel() {

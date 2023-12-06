@@ -19,7 +19,8 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
     var ref: DatabaseReference!
     var dateFormatter = DateFormatter()
     let userDefaults: UserDefaults = UserDefaults.standard
-    var connect: Bool!
+    var connect = false
+    var isMode = 0
     var userId: String!
     var roomIdString: String!
     var roomNameString: String!
@@ -34,10 +35,6 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableViewSetUp()
         menu()
         UISetUp()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        observeRealtimeDatabase()
     }
     
     func tableViewSetUp() {
@@ -95,9 +92,12 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
                 self.connect = true
                 if let oldUserId = self.userDefaults.string(forKey: "userId") {
                     self.moveData(oldUserId: oldUserId)
+                } else {
+                    self.observeRealtimeDatabase()
                 }
             } else {
                 self.connect = false
+                GeneralPurpose.notConnectAlert(VC: self)
             }
         })
     }
@@ -107,7 +107,7 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
         otherArray = []
         
         ref.child("users").child(userId).child("rooms").observe(.childAdded, with: { [self] snapshot in
-            GeneralPurpose.AIV(VC: self, view: view, status: "start", session: "get")
+            GeneralPurpose.AIV(VC: self, view: view, status: "start")
             let roomId = snapshot.key
             ref.child("users").child(userId).child("rooms").observeSingleEvent(of: .value, with: { [self] snapshot in
                 let roomCount = Int(snapshot.childrenCount)
@@ -136,9 +136,8 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
                                 }
                                 otherArray.sort {$0.lastEditTime > $1.lastEditTime}
                             }
-                            print("roomCount:", roomCount)
                             if roomCount == guestArray.count + otherArray.count {
-                                GeneralPurpose.AIV(VC: self, view: view, status: "stop", session: "get")
+                                GeneralPurpose.AIV(VC: self, view: view, status: "stop")
                             }
                             tableView.reloadData()
                         })
@@ -192,7 +191,7 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func moveData(oldUserId: String) {
-        GeneralPurpose.AIV(VC: self, view: view, status: "start", session: "other")
+        GeneralPurpose.AIV(VC: self, view: view, status: "start")
         ref = Database.database().reference()
         userId = Auth.auth().currentUser?.uid
         
@@ -234,7 +233,7 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
                 let imageUrl = snapshot.childSnapshot(forPath: "imageUrl").value as? String
                 ref.child("users").child(userId!).child(listId).child("memo").child(memoId).updateChildValues(["memoCount": memoCount, "checkedCount": checkedCount, "shoppingMemo": shoppingMemo, "isChecked": isChecked, "dateNow": dateNow, "checkedTime": checkedTime, "imageUrl": imageUrl!])
                 ref.child("users").child(oldUserId).child(listId).child("memo").child(memoId).removeValue()
-                if imageUrl! == "" { relayFinish(); return }
+                if imageUrl! == "" { return }
                 
                 let imageRef = Storage.storage().reference(forURL: imageUrl!)
                 imageRef.getData(maxSize: 1 * 1024 * 1024) { data, error in
@@ -250,7 +249,6 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
                                     guard let downloadURL = url else { return }
                                     let imageUrl = downloadURL.absoluteString
                                     self.ref.child("users").child(self.userId!).child(listId).child("memo").child(memoId).updateChildValues(["imageUrl": imageUrl])
-                                    self.relayFinish()
                                 }
                             }
                         }
@@ -258,11 +256,17 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
                 }
             })
         })
+        ref.child("users").observe(.childRemoved, with: { [self] snapshot in
+            let userId = snapshot.key
+            if userId == oldUserId {
+                relayFinish()
+            }
+        })
     }
     
     func relayFinish() {
-        GeneralPurpose.AIV(VC: self, view: self.view, status: "stop", session: "other")
-        let alert: UIAlertController = UIAlertController(title: "引き継ぎが完了しました", message: "以前のアカウントのデータは削除されました。使用方法はチュートリアルをご覧ください。", preferredStyle: .alert)
+        GeneralPurpose.AIV(VC: self, view: self.view, status: "stop")
+        let alert: UIAlertController = UIAlertController(title: "引き継ぎが完了しました", message: "以前のアカウントのデータは削除されました。アプリを再起動してください。", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
             self.userDefaults.removeObject(forKey: "userId")
         }))
@@ -322,7 +326,7 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
             } else {
                 roomIdString = roomArray[indexPath.section].roomId
                 roomNameString = roomArray[indexPath.section].roomName
-                self.performSegue(withIdentifier: "toLVC", sender: nil)
+                GeneralPurpose.segue(VC: self, id: "toLVC", connect: connect)
             }
         } else {
             GeneralPurpose.notConnectAlert(VC: self)
@@ -348,7 +352,7 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
             self.ref.child("users").child(self.userId).child("rooms").updateChildValues([roomId: "member"])
             self.roomIdString = roomId
             self.roomNameString = self.roomArray[indexPath.section].roomName
-            self.performSegue(withIdentifier: "toLVC", sender: nil)
+            GeneralPurpose.segue(VC: self, id: "toLVC", connect: self.connect)
         }))
         alert.addAction(UIAlertAction(title: "保留", style: .default))
         alert.addAction(UIAlertAction(title: "加入しない", style: .cancel, handler: { anction in
@@ -388,14 +392,15 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func menu() {
-        let Items = UIMenu(title: "", options: .displayInline, children: [
-            UIAction(title: "情報・設定", image: UIImage(systemName: "gearshape"), handler: { _ in
-                self.performSegue(withIdentifier: "toSVC", sender: nil)}),
-            UIAction(title: "操作説明", image: UIImage(systemName: "questionmark.circle"), handler: { _ in
-            })
-        ])
+        let Item1 = UIAction(title: "情報・設定", image: UIImage(systemName: "gearshape"), handler: { _ in
+            GeneralPurpose.segue(VC: self, id: "toSVC", connect: connect)
+        })
+        let Item2 = UIAction(title: "操作説明", image: UIImage(systemName: "questionmark.circle"), handler: { _ in
+            GeneralPurpose.segue(VC: self, id: "toGVC", connect: connect)
+        })
+        let Items = UIMenu(title: "", options: .displayInline, children: [Item1, Item2])
         let signOut = UIAction(title: "サインアウト", image: UIImage(systemName: "door.right.hand.open"), attributes: .destructive, handler: { _ in self.signOut()})
-        let menu = UIMenu(title: "", image: UIImage(systemName: "ellipsis.circle"), options: .displayInline, children: [Items, signOut])
+        let menu = UIMenu(title: "", image: UIImage(systemName: "ellipsis.circle"), children: [Items, signOut])
         signOutBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "ellipsis.circle"), menu: menu)
         signOutBarButtonItem.tintColor = .label
         self.navigationItem.rightBarButtonItem = signOutBarButtonItem
