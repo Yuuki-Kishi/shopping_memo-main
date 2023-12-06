@@ -23,14 +23,27 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
     var imageRef: StorageReference!
     var ref: DatabaseReference!
     let df = DateFormatter()
+    let userDefaults: UserDefaults = UserDefaults.standard
     let storage = Storage.storage()
     var connect = false
+    var isFirst = true
     var menuBarButtonItem: UIBarButtonItem!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         UISetUp()
         setUpData()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        let isBack = userDefaults.bool(forKey: "isBack")
+        if isBack {
+            userDefaults.removeObject(forKey: "isBack")
+            let viewControllers = self.navigationController?.viewControllers
+            self.navigationController?.popToViewController(viewControllers![viewControllers!.count - 4], animated: true)
+        }
+        if !isFirst { observeRealtimeDatabase() }
+        isFirst = false
     }
     
     func UISetUp() {
@@ -143,38 +156,10 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
             if memoId == self.memoIdString { self.title = shoppingMemo }
         })
         
-        ref.child("rooms").observe(.childRemoved, with:  { [self] snapshot in
-            let roomId = snapshot.key
-            if roomId == roomIdString {
-                let alert: UIAlertController = UIAlertController(title: "ルームが削除されました", message: "詳しくはルームの管理者にお問い合わせください。", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { anction in
-                    let viewControllers = self.navigationController?.viewControllers
-                    self.navigationController?.popToViewController(viewControllers![viewControllers!.count - 4], animated: true)
-                }))
-                self.present(alert, animated: true, completion: nil)
-            }
-        })
-        
-        ref.child("rooms").child(roomIdString).child("lists").observe(.childRemoved, with: { snapshot in
-            let listId = snapshot.key
-            if listId == self.listIdString {
-                let alert: UIAlertController = UIAlertController(title: "リストが削除されました", message: "詳しくはリストを削除したメンバーにお問い合わせください。", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { anction in
-                    let viewControllers = self.navigationController?.viewControllers
-                    self.navigationController?.popToViewController(viewControllers![viewControllers!.count - 3], animated: true)
-                }))
-                self.present(alert, animated: true, completion: nil)
-            }
-        })
-        
         ref.child("rooms").child(roomIdString).child("lists").child(listIdString).child("memo").observe(.childRemoved, with: { [self] snapshot in
             let memoId = snapshot.key
             if memoId == memoIdString {
-                let alert: UIAlertController = UIAlertController(title: "「" + self.shoppingMemoName + "」が削除されました", message: "詳しくは削除したメンバーにお問い合わせください。", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { anction in
-                    self.navigationController?.popViewController(animated: true)
-                }))
-                self.present(alert, animated: true, completion: nil)
+                GeneralPurpose.noData(VC: self, num: 4)
             }
         })
         

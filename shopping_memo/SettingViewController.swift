@@ -26,7 +26,6 @@ class SettingViewController: UIViewController, UITableViewDelegate, UITableViewD
         super.viewDidLoad()
         title = "情報・設定"
         tableViewSetUp()
-        setUpAndObserveRealtimeDatabase()
     }
     
     func tableViewSetUp() {

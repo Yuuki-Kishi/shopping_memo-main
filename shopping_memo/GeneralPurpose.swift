@@ -47,4 +47,13 @@ class GeneralPurpose {
         if connect { VC.performSegue(withIdentifier: id, sender: nil) }
         else { notConnectAlert(VC: VC) }
     }
+    
+    static func noData(VC: UIViewController, num: Int) {
+        let alert: UIAlertController = UIAlertController(title: "閲覧中のデータが削除されました", message: "ホームに戻ります。詳しくは削除実行者にお問い合わせください。", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { anction in
+            let viewControllers = VC.navigationController?.viewControllers
+            VC.navigationController?.popToViewController(viewControllers![viewControllers!.count - num], animated: true)
+        }))
+        VC.present(alert, animated: true, completion: nil)
+    }
 }

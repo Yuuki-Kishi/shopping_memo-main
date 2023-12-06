@@ -69,7 +69,6 @@ class DeleteViewController: UIViewController, UITextFieldDelegate {
         userIdLabel.clipsToBounds = true
         userIdLabel.adjustsFontSizeToFitWidth = true
         deleteButton.layer.cornerRadius = 18.0
-        deleteButton.layer.cornerCurve = .continuous
     }
     
     @IBAction func delete() {
@@ -93,8 +92,18 @@ class DeleteViewController: UIViewController, UITextFieldDelegate {
                                 self.navigationController?.popToRootViewController(animated: true)
                             }
                         }
+                        return
                     })
                 })
+                let user = Auth.auth().currentUser
+                user?.delete { error in
+                    if let error = error {
+                        print("error")
+                    } else {
+                        self.userDefaults.removeObject(forKey: "email")
+                        self.navigationController?.popToRootViewController(animated: true)
+                    }
+                }
             }))
             alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
             self.present(alert, animated: true, completion: nil)

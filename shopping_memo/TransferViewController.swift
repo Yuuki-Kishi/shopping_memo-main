@@ -137,9 +137,9 @@ class TransferViewController: UIViewController, UITableViewDelegate, UITableView
             case 0:
                 title.text = "管理者"
             case 1:
-                title.text = "メンバー"
+                title.text = "メンバー(譲渡可)"
             default:
-                title.text = "招待中"
+                title.text = "招待中(譲渡不可)"
             }
         case 2:
             if memberArray.isEmpty {
@@ -147,18 +147,18 @@ class TransferViewController: UIViewController, UITableViewDelegate, UITableView
                 case 0:
                     title.text = "管理者"
                 default:
-                    title.text = "招待中"
+                    title.text = "招待中(譲渡不可)"
                 }
             } else if guestArray.isEmpty {
                 switch section {
                 case 0:
                     title.text = "管理者"
                 default:
-                    title.text = "メンバー"
+                    title.text = "メンバー(譲渡可)"
                 }
             }
         default:
-            break
+            title.text = "管理者"
         }
         
         title.font = UIFont.systemFont(ofSize: 17, weight: .regular)

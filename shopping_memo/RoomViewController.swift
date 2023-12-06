@@ -20,6 +20,7 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
     var dateFormatter = DateFormatter()
     let userDefaults: UserDefaults = UserDefaults.standard
     var connect = false
+    var isFirst = true
     var isMode = 0
     var userId: String!
     var roomIdString: String!
@@ -35,6 +36,11 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableViewSetUp()
         menu()
         UISetUp()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        if !isFirst { observeRealtimeDatabase() }
+        isFirst = false
     }
     
     func tableViewSetUp() {
@@ -97,7 +103,8 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
                 }
             } else {
                 self.connect = false
-                GeneralPurpose.notConnectAlert(VC: self)
+                if self.isFirst { GeneralPurpose.notConnectAlert(VC: self) }
+                self.isFirst = false
             }
         })
     }
@@ -393,10 +400,10 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func menu() {
         let Item1 = UIAction(title: "情報・設定", image: UIImage(systemName: "gearshape"), handler: { _ in
-            GeneralPurpose.segue(VC: self, id: "toSVC", connect: connect)
+            GeneralPurpose.segue(VC: self, id: "toSVC", connect: self.connect)
         })
         let Item2 = UIAction(title: "操作説明", image: UIImage(systemName: "questionmark.circle"), handler: { _ in
-            GeneralPurpose.segue(VC: self, id: "toGVC", connect: connect)
+            GeneralPurpose.segue(VC: self, id: "toGVC", connect: self.connect)
         })
         let Items = UIMenu(title: "", options: .displayInline, children: [Item1, Item2])
         let signOut = UIAction(title: "サインアウト", image: UIImage(systemName: "door.right.hand.open"), attributes: .destructive, handler: { _ in self.signOut()})

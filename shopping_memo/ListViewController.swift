@@ -19,6 +19,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
     let dateFormatter = DateFormatter()
     var connect = false
     var isWithdrawal = false
+    var isFirst = true
     let userDefaults: UserDefaults = UserDefaults.standard
     var listArray = [(listId: String, listName: String, listCount: Int)]()
     var ref: DatabaseReference!
@@ -36,6 +37,11 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         setUpTableView()
         setUpData()
         moveData()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        if !isFirst { observeRealtimeDatabase() }
+        isFirst = false
     }
     
     func UISetUp() {
@@ -132,18 +138,14 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         ref.child("rooms").observe(.childRemoved, with: { [self] snapshot in
             let roomId = snapshot.key
             if roomId == roomIdString && myAuthority != "administrator" && !isWithdrawal {
-                let alert: UIAlertController = UIAlertController(title: "ルームが削除されました", message: "詳しくはルームの管理者にお問い合わせください。", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { anction in
-                    self.navigationController?.popViewController(animated: true)
-                }))
-                self.present(alert, animated: true, completion: nil)
+                GeneralPurpose.noData(VC: self, num: 2)
             }
         })
         
         ref.child("users").child(userId).child("rooms").observe(.childRemoved, with: { [self] snapshot in
             let roomId = snapshot.key
             let authority = snapshot.value as? String
-            if roomId == self.roomIdString && authority! != "administrator" {
+            if roomId == self.roomIdString && authority! != "administrator" && !isWithdrawal {
                 let alert: UIAlertController = UIAlertController(title: "ルームを追放されました", message: "詳しくはルームの管理者にお問い合わせください。", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { anction in
                     self.navigationController?.popViewController(animated: true)
@@ -296,6 +298,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
                 if memberCount == 1 {
                     let alert: UIAlertController = UIAlertController(title: "本当に削除しますか？", message: "この操作を取り消すことはできません。", preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "削除", style: .destructive, handler: { action in
+                        self.isWithdrawal = true
                         self.ref.child("rooms").child(self.roomIdString).child("members").observe(.childAdded, with: { snapshot in
                             let userId = snapshot.key
                             self.ref.child("users").child(userId).child("rooms").child(self.roomIdString).removeValue()
@@ -400,8 +403,12 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
                 UIAction(title: "メンバーの確認・変更", image: UIImage(systemName: "person.2.fill"), handler: { _ in GeneralPurpose.segue(VC: self, id: "toMVC", connect: self.connect)}),
                 UIAction(title: "リストを並び替え", image: UIImage(systemName: "list.bullet"), handler: { _ in
                     if !self.listArray.isEmpty {
-                        self.tableView.isEditing = true
-                        self.menu()
+                        if self.connect {
+                            self.tableView.isEditing = true
+                            self.menu()
+                        } else {
+                            GeneralPurpose.notConnectAlert(VC: self)
+                        }
                     } else {
                         let alert: UIAlertController = UIAlertController(title: "並べ替えできません。", message: "並べ替えるリストが存在しません。", preferredStyle: .alert)
                         alert.addAction(UIAlertAction(title: "OK", style: .default))

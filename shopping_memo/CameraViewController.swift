@@ -28,6 +28,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
     var ref: DatabaseReference!
     let df = DateFormatter()
     let settings = AVCapturePhotoSettings()
+    let userDefaults: UserDefaults = UserDefaults.standard
     let storage = Storage.storage()
     var connect = false
     var flashMode = 2
@@ -63,15 +64,13 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         let safeAreaTop = self.view.safeAreaInsets.top
         if y > 100 {
             self.previewLayerBackgroundView.frame = CGRect(x: 0, y: safeAreaTop, width: screenWidth, height: viewHeight)
+            self.imageView.frame = CGRect(x: 0, y: safeAreaTop, width: screenWidth, height: viewHeight)
         } else {
             self.previewLayerBackgroundView.frame = CGRect(x: 0, y: safeAreaTop, width: screenWidth, height: viewHeight)
+            self.imageView.frame = CGRect(x: 0, y: safeAreaTop, width: screenWidth, height: viewHeight)
         }
         self.cameraPreviewLayer?.frame = CGRect(x: 0, y: 0, width: screenWidth, height: viewHeight)
     }
-    
-//    override func viewWillAppear(_ animated: Bool) {
-//        startCamera(isBack: isBack)
-//    }
     
     func setUpUI() {
         title = "画像を撮影"
@@ -128,37 +127,13 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
     }
     
     func obserbeRealtimeDatabase() {
-        ref.child("rooms").observe(.childRemoved, with:  { [self] snapshot in
-            let roomId = snapshot.key
-            if roomId == roomIdString {
-                let alert: UIAlertController = UIAlertController(title: "ルームが削除されました", message: "詳しくはルームの管理者にお問い合わせください。", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { anction in
-                    let viewControllers = self.navigationController?.viewControllers
-                    self.navigationController?.popToViewController(viewControllers![viewControllers!.count - 4], animated: true)
-                }))
-                self.present(alert, animated: true, completion: nil)
-            }
-        })
-        
-        ref.child("rooms").child(roomIdString).child("lists").observe(.childRemoved, with: { snapshot in
-            let listId = snapshot.key
-            if listId == self.listIdString {
-                let alert: UIAlertController = UIAlertController(title: "リストが削除されました", message: "詳しくはリストを削除したメンバーにお問い合わせください。", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { anction in
-                    let viewControllers = self.navigationController?.viewControllers
-                    self.navigationController?.popToViewController(viewControllers![viewControllers!.count - 3], animated: true)
-                }))
-                self.present(alert, animated: true, completion: nil)
-            }
-        })
-        
         ref.child("rooms").child(roomIdString).child("lists").child(listIdString).child("memo").observe(.childRemoved, with: { [self] snapshot in
             let memoId = snapshot.key
-            print("memoId:", memoId)
             if memoId == memoIdString {
-                let alert: UIAlertController = UIAlertController(title: "「" + self.shoppingMemoName + "」が削除されました", message: "詳しくは削除したメンバーにお問い合わせください。", preferredStyle: .alert)
+                let alert: UIAlertController = UIAlertController(title: "閲覧中のデータが削除されました", message: "ホームに戻ります。詳しくは削除したメンバーにお問い合わせください。", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { anction in
-                    self.navigationController?.popViewController(animated: true)
+                    self.userDefaults.set(true, forKey: "isBack")
+                    self.dismiss(animated: true)
                 }))
                 self.present(alert, animated: true, completion: nil)
             }
@@ -169,8 +144,8 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
             if userId == self.userId {
                 let alert: UIAlertController = UIAlertController(title: "ルームを追放されました", message: "詳しくはルームの管理者にお問い合わせください。", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { anction in
-                    let viewControllers = self.navigationController?.viewControllers
-                    self.navigationController?.popToViewController(viewControllers![viewControllers!.count - 4], animated: true)
+                    self.userDefaults.set(4, forKey: "back")
+                    self.dismiss(animated: true)
                 }))
                 self.present(alert, animated: true, completion: nil)
             }
@@ -219,7 +194,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
             setUpChangeCameraReTakeButton()
             if #available(iOS 16.0, *) { uploadBarButtonItem.isHidden = true }
             takePhotoButton.isHidden = false
-            cameraPreviewLayer?.isHidden = false
+            previewLayerBackgroundView.isHidden = false
             flashModeButton.isHidden = false
         }
     }
@@ -304,13 +279,6 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         self.cameraPreviewLayer?.videoGravity = AVLayerVideoGravity.resizeAspectFill
         // プレビューレイヤの表示の向きを設定
         self.cameraPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portrait
-        print("NBHeight:", safeAreaTop)
-//        if y > 100 {
-//            self.previewLayerBackgroundView.frame = CGRect(x: 0, y: safeAreaTop, width: screenWidth, height: viewHeight)
-//        } else {
-//            self.previewLayerBackgroundView.frame = CGRect(x: 0, y: safeAreaTop, width: screenWidth, height: viewHeight)
-//        }
-//        self.cameraPreviewLayer?.frame = self.previewLayerBackgroundView.frame
         self.previewLayerBackgroundView.layer.insertSublayer(self.cameraPreviewLayer!, at: 0)
     }
     
@@ -324,7 +292,6 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         }
         // prepare new capture session & preview
         isBack = !isBack
-        print("isBack:",isBack)
         let newVideoLayer: AVCaptureVideoPreviewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
         let screenHeight = UIScreen.main.bounds.height
         let screenWidth = UIScreen.main.bounds.width
@@ -338,9 +305,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         }
         newVideoLayer.frame = CGRect(x: 0, y: 0, width: screenWidth, height: viewHeight)
         newVideoLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
-        
         self.startCamera(isBack: isBack)
-
         // horizontal flip
         if isBack {
             UIView.transition(with: self.previewLayerBackgroundView, duration: 0.3, options: [.transitionFlipFromRight], animations: nil, completion: { _ in

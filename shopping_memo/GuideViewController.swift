@@ -30,6 +30,7 @@ class GuideViewController: UIViewController, UIScrollViewDelegate, UIImagePicker
     }
     
     func setUpData() {
+        title = "操作説明"
         let connectedRef = Database.database().reference(withPath: ".info/connected")
         connectedRef.observe(.value, with: { snapshot in
             if snapshot.value as? Bool ?? false {
@@ -42,7 +43,7 @@ class GuideViewController: UIViewController, UIScrollViewDelegate, UIImagePicker
     
     func storageAdministratorImage() {
         GeneralPurpose.AIV(VC: self, view: view, status: "start")
-        if administratorImageNameArray.count == administratorImageArray.count {
+        if administratorImageNameArray.count > administratorImageArray.count {
             for imageName in administratorImageNameArray {
                 Task {
                     let image = await getImage(imageName: imageName, folderName: "administrator")
@@ -67,7 +68,7 @@ class GuideViewController: UIViewController, UIScrollViewDelegate, UIImagePicker
     
     func storageMemberImage() {
         GeneralPurpose.AIV(VC: self, view: view, status: "start")
-        if memberImageNameArray.count == memberImageArray.count {
+        if memberImageNameArray.count > memberImageArray.count {
             for imageName in memberImageNameArray {
                 Task {
                     let image = await getImage(imageName: imageName, folderName: "member")
@@ -79,6 +80,32 @@ class GuideViewController: UIViewController, UIScrollViewDelegate, UIImagePicker
                         setUpScrollView(count: memberImageArray.count)
                         setUpImageView(type: "member")
                         setUpPageControl(count: memberImageArray.count)
+                        GeneralPurpose.AIV(VC: self, view: view, status: "stop")
+                    }
+                }
+            }
+        } else {
+            setUpScrollView(count: memberImageArray.count)
+            setUpImageView(type: "member")
+            setUpPageControl(count: memberImageArray.count)
+            GeneralPurpose.AIV(VC: self, view: view, status: "stop")
+        }
+    }
+    
+    func storageTipsImage() {
+        GeneralPurpose.AIV(VC: self, view: view, status: "start")
+        if tipsImageNameArray.count > tipsImageArray.count {
+            for imageName in tipsImageNameArray {
+                Task {
+                    let image = await getImage(imageName: imageName, folderName: "tips")
+                    let sortNumber = self.tipsImageNameArray.firstIndex(of: imageName)
+                    tipsImageArray.append((sortNumber: Int(sortNumber!), imageData: image!))
+                    tipsImageArray.sort {$0.sortNumber < $1.sortNumber}
+                    print(imageName, sortNumber!, tipsImageArray.count)
+                    if tipsImageArray.count == tipsImageNameArray.count {
+                        setUpScrollView(count: tipsImageArray.count)
+                        setUpImageView(type: "tips")
+                        setUpPageControl(count: tipsImageArray.count)
                         GeneralPurpose.AIV(VC: self, view: view, status: "stop")
                     }
                 }
@@ -158,6 +185,7 @@ class GuideViewController: UIViewController, UIScrollViewDelegate, UIImagePicker
         pageControl.pageIndicatorTintColor = UIColor.lightGray
         // pageControlの現在のページのドットの色
         pageControl.currentPageIndicatorTintColor = UIColor.label
+        pageControl.isUserInteractionEnabled = false
         self.view.addSubview(pageControl)
     }
     
@@ -178,6 +206,11 @@ class GuideViewController: UIViewController, UIScrollViewDelegate, UIImagePicker
                 self.storageMemberImage()
             }),
             UIAction(title: "使えると便利編", image: UIImage(systemName: "lightbulb.circle"), handler: { _ in
+                let subviews = self.view.subviews
+                for subview in subviews {
+                    subview.removeFromSuperview()
+                }
+                self.storageTipsImage()
             })
         ]
         let menu = UIMenu(title: "", image: UIImage(systemName: "ellipsis.circle"), children: Items)

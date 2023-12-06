@@ -397,7 +397,7 @@
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ZdM-Vd-2QY">
                                 <rect key="frame" x="70" y="153" width="290" height="119.66666666666669"/>
-                                <string key="text">アカウントを削除するために削除するアカウントで再度ログインしてください。
+                                <string key="text">アカウントを削除するために削除したいアカウントで再度ログインしてください。
 一度削除したアカウントは二度と元には戻りません。</string>
                                 <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                 <nil key="textColor"/>

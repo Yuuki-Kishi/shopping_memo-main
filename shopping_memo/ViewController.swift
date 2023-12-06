@@ -19,6 +19,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
     var removeSwitch = false
     var connect = false
     var linking = false
+    var isFirst = true
     
     @IBOutlet var table: UITableView!
     @IBOutlet var titleTextField: UITextField!
@@ -47,6 +48,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
         UISetUp()
         setUpTableViewAndTextField()
         menu()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        if !isFirst { observeRealtimeDatabase() }
+        isFirst = false
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -188,26 +194,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
             }
         })
         
-        ref.child("rooms").observe(.childRemoved, with: { [self] snapshot in
-            let roomId = snapshot.key
-            if roomId == roomIdString {
-                let alert: UIAlertController = UIAlertController(title: "ルームが削除されました", message: "詳しくはルームの管理者にお問い合わせください。", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { anction in
-                    let viewControllers = self.navigationController?.viewControllers
-                    self.navigationController?.popToViewController(viewControllers![viewControllers!.count - 3], animated: true)
-                }))
-                self.present(alert, animated: true, completion: nil)
-            }
-        })
-        
         ref.child("rooms").child(roomIdString).child("lists").observe(.childRemoved, with: { [self] snapshot in
             let listId = snapshot.key
             if listId == listIdString {
-                let alert: UIAlertController = UIAlertController(title: "リストが削除されました", message: "詳しくはリストを削除したメンバーにお問い合わせください。", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { action in
-                    self.navigationController?.popViewController(animated: true)
-                }))
-                self.present(alert, animated: true)
+                GeneralPurpose.noData(VC: self, num: 3)
             }
         })
         
@@ -570,8 +560,12 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
             ]
             
             let Item3 = UIAction(title: "メモを並び替え", image: UIImage(systemName: "list.bullet"), handler: { _ in
-                self.table.isEditing = true
-                self.menu()
+                if self.connect {
+                    self.table.isEditing = true
+                    self.menu()
+                } else {
+                    GeneralPurpose.notConnectAlert(VC: self)
+                }
             })
             
             if checkedSwitch {
