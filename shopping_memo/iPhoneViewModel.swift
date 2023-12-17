@@ -12,6 +12,7 @@ import UIKit
 final class iPhoneViewModel: NSObject {
     var memoArray = [(memoId: String, memoCount: Int, checkedCount: Int, shoppingMemo: String, isChecked: Bool, dateNow: Date, checkedTime: Date, imageUrl: String)]()
     var session: WCSession
+    var isReachable = false
     
     var iPhoneDelegate: iPhoneViewModelDelegate? = nil
 
@@ -29,7 +30,13 @@ extension iPhoneViewModel: WCSessionDelegate {
             print(error.localizedDescription)
         } else {
             print("The session has completed activation.")
+            isReachable = session.isReachable
         }
+    }
+    
+    func sessionReachabilityDidChange(_ session: WCSession) {
+        isReachable = session.isReachable
+        self.iPhoneDelegate?.isCanLink(isCanLink: isReachable)
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
@@ -54,4 +61,5 @@ protocol iPhoneViewModelDelegate {
     func check(indexPath: IndexPath)
     func getData()
     func cleared()
+    func isCanLink(isCanLink: Bool)
 }

@@ -18,7 +18,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
     var checkedSwitch = false
     var removeSwitch = false
     var connect = false
-    var linking = false
+    var isLink = false
+    var isCanLink = false
     var isFirst = true
     
     @IBOutlet var table: UITableView!
@@ -69,7 +70,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
         memoSortInt = userDefaults.integer(forKey: "memoSortInt")
         checkedSortInt = userDefaults.integer(forKey: "checkedSortInt")
         checkedSwitch = userDefaults.bool(forKey: "checkedSwitch")
-        userDefaults.set(linking, forKey: "linking")
+        userDefaults.set(isLink, forKey: "isLink")
         if userDefaults.bool(forKey: "notSleepSwitch") { UIApplication.shared.isIdleTimerDisabled = true }
         titleTextField.delegate = self
         viewModel.iPhoneDelegate = self
@@ -157,7 +158,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
             let date = dateFormatter.date(from: dateNow)
             let time = dateFormatter.date(from: checkedTime)
             memoSortInt = userDefaults.integer(forKey: "memoSortInt")
-            linking = userDefaults.bool(forKey: "linking")
+            isLink = userDefaults.bool(forKey: "isLink")
             if let mIndex = memoArray.firstIndex(where: {$0.memoId == memoId}) {
                 if !isChecked {
                     memoArray[mIndex] = ((memoId: memoId, memoCount: memoCount, checkedCount: checkedCount, shoppingMemo: shoppingMemo, isChecked: isChecked, dateNow: date!, checkedTime: time!, imageUrl: imageUrl))
@@ -180,7 +181,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
             guard let listName = snapshot.childSnapshot(forPath: "listName").value as? String else { return }
             listNameString = listName
             title = listName
-            if linking { sendMessage(notice: "sendData")}
+            if isLink { sendMessage(notice: "sendData")}
         })
         //         memoの中身が消えたとき
         ref.child("rooms").child(roomIdString).child("lists").child(listIdString).child("memo").observe(.childRemoved, with: { [self] snapshot in
@@ -592,7 +593,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
                 self.table.reloadData()
             })
             
-            if linking {
+            if isLink {
                 watchTitle = "Apple Watchを切断"
                 watchImage = UIImage(systemName: "applewatch.slash")
             } else {
@@ -620,22 +621,24 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
     }
     
     func watchLink() {
-        if linking {
-            let alert: UIAlertController = UIAlertController(title: "Apple Watchとの通信を切断しますか？", message: "再度利用するには再度接続する必要があります。", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "切断", style: .destructive, handler: { anction in
-                self.sendMessage(notice: "clear")
-                GeneralPurpose.AIV(VC: self, view: self.view, status: "start")
-            }))
-            alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
-            self.present(alert, animated: true, completion: nil)
-        } else {
-            let alert: UIAlertController = UIAlertController(title: "Apple Watchは接続されていますか？", message: "このデバイスに接続されていないとデータを送ることができません。", preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { anction in
-                self.sendMessage(notice: "sendData")
-                GeneralPurpose.AIV(VC: self, view: self.view, status: "start")
-            }))
-            alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
-            self.present(alert, animated: true, completion: nil)
+        if isCanLink {
+            if isLink {
+                let alert: UIAlertController = UIAlertController(title: "Apple Watchとの通信を切断しますか？", message: "再度利用するには再度接続する必要があります。", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "切断", style: .destructive, handler: { anction in
+                    self.sendMessage(notice: "clear")
+                    GeneralPurpose.AIV(VC: self, view: self.view, status: "start")
+                }))
+                alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
+                self.present(alert, animated: true, completion: nil)
+            } else {
+                let alert: UIAlertController = UIAlertController(title: "Apple Watchは接続されていますか？", message: "このデバイスに接続されていないとデータを送ることができません。", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { anction in
+                    self.sendMessage(notice: "sendData")
+                    GeneralPurpose.AIV(VC: self, view: self.view, status: "start")
+                }))
+                alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
+                self.present(alert, animated: true, completion: nil)
+            }
         }
     }
     
@@ -655,8 +658,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
     }
     
     func reply() {
-        self.linking = true
-        self.userDefaults.set(self.linking, forKey: "linking")
+        self.isLink = true
+        self.userDefaults.set(self.isLink, forKey: "isLink")
         menu()
         GeneralPurpose.AIV(VC: self, view: self.view, status: "stop")
         let alert: UIAlertController = UIAlertController(title: "Apple Watchと接続しました", message: "画面を移動すると接続は切断されます。", preferredStyle: .alert)
@@ -665,8 +668,8 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
     }
     
     func signalCut() {
-        self.linking = false
-        self.userDefaults.set(self.linking, forKey: "linking")
+        self.isLink = false
+        self.userDefaults.set(self.isLink, forKey: "isLink")
         menu()
         GeneralPurpose.AIV(VC: self, view: self.view, status: "stop")
         let alert: UIAlertController = UIAlertController(title: "Apple Watchとの通信を切断しました", message: "再度使用するには再度接続してください。", preferredStyle: .alert)
@@ -762,7 +765,7 @@ extension ViewController {
         default:
             checkedArray.sort {$0.checkedCount < $1.checkedCount}
         }
-        if linking { sendMessage(notice: "reloadData") }
+        if isLink { sendMessage(notice: "reloadData") }
         self.table.reloadData()
     }
     
@@ -888,4 +891,5 @@ extension ViewController: iPhoneViewModelDelegate {
     func check(indexPath: IndexPath) { buttonPressed(indexPath: indexPath) }
     func getData() { reply() }
     func cleared() { signalCut() }
+    func isCanLink(isCanLink: Bool) { self.isCanLink = isCanLink }
 }
