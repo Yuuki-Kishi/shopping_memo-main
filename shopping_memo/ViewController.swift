@@ -63,7 +63,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         UIApplication.shared.isIdleTimerDisabled = false
-        sendMessage(notice: "clear")
+        sendMessage(notice: "secretClear")
     }
     
     func setUpDelegateAndData() {
@@ -74,6 +74,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
         if userDefaults.bool(forKey: "notSleepSwitch") { UIApplication.shared.isIdleTimerDisabled = true }
         titleTextField.delegate = self
         viewModel.iPhoneDelegate = self
+        sendMessage(notice: "launched")
         let connectedRef = Database.database().reference(withPath: ".info/connected")
         connectedRef.observe(.value, with: { snapshot in
             if snapshot.value as? Bool ?? false {
@@ -639,6 +640,10 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
                 alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
                 self.present(alert, animated: true, completion: nil)
             }
+        } else {
+            let alert: UIAlertController = UIAlertController(title: "Apple Watchと接続できません。", message: "Apple Watchをスマホとペアリングしてください。", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .cancel))
+            self.present(alert, animated: true, completion: nil)
         }
     }
     
@@ -651,6 +656,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
             }
         } else if notice == "clear" {
             let messages = ["notice": "clear"]
+            self.viewModel.session.sendMessage(messages, replyHandler: nil) { (error) in
+                print(error.localizedDescription)
+            }
+        } else if notice == "launched" {
+            let messages = ["notice": "launched"]
             self.viewModel.session.sendMessage(messages, replyHandler: nil) { (error) in
                 print(error.localizedDescription)
             }
@@ -891,5 +901,6 @@ extension ViewController: iPhoneViewModelDelegate {
     func check(indexPath: IndexPath) { buttonPressed(indexPath: indexPath) }
     func getData() { reply() }
     func cleared() { signalCut() }
+    
     func isCanLink(isCanLink: Bool) { self.isCanLink = isCanLink }
 }

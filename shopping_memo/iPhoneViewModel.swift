@@ -50,6 +50,8 @@ extension iPhoneViewModel: WCSessionDelegate {
                 self.iPhoneDelegate?.getData()
             } else if request == "clearData" {
                 self.iPhoneDelegate?.cleared()
+            } else if request == "launched" {
+                self.iPhoneDelegate?.isCanLink(isCanLink: true)
             }
         }
     }

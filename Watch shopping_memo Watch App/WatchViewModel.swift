@@ -53,14 +53,21 @@ extension WatchViewModel: WCSessionDelegate {
                         print("error:", error.localizedDescription)
                     }
                 }
-            } else if notice == "clear" {
+            } else if notice == "launched" {
+                let messages: [String : Any] = ["request": "launched"]
+                session.sendMessage(messages, replyHandler: nil) { (error) in
+                    print("error:", error.localizedDescription)
+                }
+            } else if notice == "clear" || notice == "secretClear" {
                 self.listName = ""
                 self.isLink = false
                 self.memoArray.removeAll()
                 self.watchDelegate?.reloadData()
-                let messages: [String : Any] = ["request": "clearData"]
-                session.sendMessage(messages, replyHandler: nil) { (error) in
-                    print(error.localizedDescription)
+                if notice == "clear" {
+                    let messages: [String : Any] = ["request": "clearData"]
+                    session.sendMessage(messages, replyHandler: nil) { (error) in
+                        print(error.localizedDescription)
+                    }
                 }
             }
         }
