@@ -62,7 +62,6 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
                 self.observeRealtimeDatabase()
             } else {
                 self.connect = false
-                GeneralPurpose.notConnectAlert(VC: self)
             }
         })
     }
@@ -217,11 +216,10 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
     }
     
     func deleteImage() {
-        guard let uid = userId else { return }
         guard let roomId = roomIdString else { return }
         guard let listId = listIdString else { return }
         guard let memoId = memoIdString else { return }
-        let imageRef = Storage.storage().reference().child("/\(uid)/\(roomId)/\(listId)/\(memoId).jpg")
+        let imageRef = Storage.storage().reference().child("/\(roomId)/\(listId)/\(memoId).jpg")
         if connect {
             let alert: UIAlertController = UIAlertController(title: "画像を削除", message: "画像を削除してもよろしいですか。", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "削除", style: .destructive, handler: { action in
@@ -264,11 +262,11 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
                 self.present(alert, animated: true, completion: nil)
             })
         ])
-        let delete = UIAction(title: "画像を削除", attributes: .destructive, handler: { _ in self.deleteImage()})
+        let delete = UIAction(title: "画像を削除", image: UIImage(systemName: "trash"), attributes: .destructive, handler: { _ in self.deleteImage()})
         
         if url == "" {
-            let menu = UIMenu(title: "", image: UIImage(systemName: "plus.viewfinder"), children: [plus])
-            menuBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus.viewfinder"), menu: menu)
+            let menu = UIMenu(title: "", image: UIImage(systemName: "plus"), children: [plus])
+            menuBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "plus"), menu: menu)
             menuBarButtonItem.tintColor = .label
         } else {
             let menu = UIMenu(title: "", image: UIImage(systemName: "ellipsis.circle"), options: .displayInline, children: [Items, delete])

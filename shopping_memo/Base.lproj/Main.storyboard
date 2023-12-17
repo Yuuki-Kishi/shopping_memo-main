@@ -559,8 +559,8 @@
                                 <color key="backgroundColor" name="MyGreen"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="hxX-j9-sa5" secondAttribute="height" multiplier="1:1" id="EKo-wd-asE"/>
-                                    <constraint firstAttribute="height" constant="290" id="SdZ-Um-PZO"/>
-                                    <constraint firstAttribute="width" constant="290" id="cWE-Lq-uJf"/>
+                                    <constraint firstAttribute="height" relation="lessThanOrEqual" constant="290" id="Tfw-Dn-8e5"/>
+                                    <constraint firstAttribute="width" relation="lessThanOrEqual" constant="290" id="sZm-X7-xhw"/>
                                 </constraints>
                             </imageView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xOP-nn-V9W" customClass="GIDSignInButton">
@@ -600,9 +600,7 @@
                             <constraint firstItem="3PM-JD-NOK" firstAttribute="trailing" secondItem="Qx3-30-lhj" secondAttribute="trailing" constant="70" id="0sz-Tr-TPr"/>
                             <constraint firstItem="Ao8-vY-Hbp" firstAttribute="leading" secondItem="3PM-JD-NOK" secondAttribute="leading" constant="70" id="1RU-kl-u70"/>
                             <constraint firstItem="3PM-JD-NOK" firstAttribute="trailing" secondItem="xOP-nn-V9W" secondAttribute="trailing" constant="70" id="2rX-ED-GRq"/>
-                            <constraint firstItem="3PM-JD-NOK" firstAttribute="trailing" secondItem="hxX-j9-sa5" secondAttribute="trailing" constant="70" id="3aQ-Cj-luL"/>
                             <constraint firstItem="Qx3-30-lhj" firstAttribute="leading" secondItem="3PM-JD-NOK" secondAttribute="leading" constant="70" id="91z-5L-Xnl"/>
-                            <constraint firstItem="hxX-j9-sa5" firstAttribute="leading" secondItem="3PM-JD-NOK" secondAttribute="leading" constant="70" id="9m7-DA-dgz"/>
                             <constraint firstItem="Qx3-30-lhj" firstAttribute="top" secondItem="Ao8-vY-Hbp" secondAttribute="bottom" constant="8" symbolic="YES" id="NMy-fc-oi4"/>
                             <constraint firstItem="xOP-nn-V9W" firstAttribute="leading" secondItem="3PM-JD-NOK" secondAttribute="leading" constant="70" id="Q1y-cU-LB1"/>
                             <constraint firstItem="xOP-nn-V9W" firstAttribute="centerX" secondItem="EiU-X3-qej" secondAttribute="centerX" id="Qeq-2q-ZYX"/>
@@ -903,10 +901,10 @@
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="txU-sY-2fI" customClass="Cell">
-                                        <rect key="frame" x="20" y="55.333332061767578" width="390" height="44.666667938232422"/>
+                                        <rect key="frame" x="20" y="55.333332061767578" width="390" height="43.666667938232422"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="txU-sY-2fI" id="U1H-0B-YzJ">
-                                            <rect key="frame" x="0.0" y="0.0" width="390" height="44.666667938232422"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="390" height="43.666667938232422"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                         </tableViewCellContentView>
                                     </tableViewCell>

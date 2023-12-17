@@ -39,7 +39,6 @@ class TransferViewController: UIViewController, UITableViewDelegate, UITableView
                 self.connect = true
             } else {
                 self.connect = false
-                GeneralPurpose.notConnectAlert(VC: self)
             }
         })
     }

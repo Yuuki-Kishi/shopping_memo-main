@@ -21,7 +21,6 @@
 		DE21E7312AB831A200896C3B /* GeneralPurpose.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE21E7302AB831A200896C3B /* GeneralPurpose.swift */; };
 		DE26EAF629E12BFA007AEC11 /* SettingTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE26EAF429E12BFA007AEC11 /* SettingTableViewCell.swift */; };
 		DE26EAF729E12BFA007AEC11 /* SettingTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE26EAF529E12BFA007AEC11 /* SettingTableViewCell.xib */; };
-		DE27F7C225735A3D007250EE /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DE27F7C125735A3D007250EE /* GoogleService-Info.plist */; };
 		DE28F6E2261F270D0074934D /* NotSigninViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE28F6E1261F270D0074934D /* NotSigninViewController.swift */; };
 		DE2F02A72B1C5B4E00AB5ACF /* GuideViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE2F02A62B1C5B4E00AB5ACF /* GuideViewController.swift */; };
 		DE3DB8292AFB8EAD0032274F /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE3DB8282AFB8EAD0032274F /* CameraViewController.swift */; };
@@ -38,6 +37,7 @@
 		DE5CBE322A4475D2009DED0C /* AppVersionCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE5CBE312A4475D2009DED0C /* AppVersionCheck.swift */; };
 		DE74EA6B2A19BD5600C87A7E /* ReLogInViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE74EA6A2A19BD5600C87A7E /* ReLogInViewController.swift */; };
 		DE74EA6D2A19BD9F00C87A7E /* DeleteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE74EA6C2A19BD9F00C87A7E /* DeleteViewController.swift */; };
+		DE793A792B24451900734994 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DE793A782B24451900734994 /* GoogleService-Info.plist */; };
 		DE9BE8FA293A3CC200992A9F /* CustomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9BE8F8293A3CC200992A9F /* CustomTableViewCell.swift */; };
 		DE9BE8FB293A3CC200992A9F /* CustomTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE9BE8F9293A3CC200992A9F /* CustomTableViewCell.xib */; };
 		DE9BE8FE293A4F8D00992A9F /* CustomListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9BE8FC293A4F8D00992A9F /* CustomListCell.swift */; };
@@ -48,7 +48,7 @@
 		DEE666312AAD7A22006F3B04 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEE666302AAD7A22006F3B04 /* ContentView.swift */; };
 		DEE666332AAD7A25006F3B04 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DEE666322AAD7A25006F3B04 /* Assets.xcassets */; };
 		DEE666362AAD7A25006F3B04 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DEE666352AAD7A25006F3B04 /* Preview Assets.xcassets */; };
-		DEE666392AAD7A25006F3B04 /* Watch shopping_memo Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = DEE6662C2AAD7A22006F3B04 /* Watch shopping_memo Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		DEE666392AAD7A25006F3B04 /* ショッピングメモ.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = DEE6662C2AAD7A22006F3B04 /* ショッピングメモ.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DEEB53FD2AAD977A00ACC49A /* WatchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEEB53FC2AAD977A00ACC49A /* WatchViewModel.swift */; };
 		DEEB53FF2AAD99CE00ACC49A /* iPhoneViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEEB53FE2AAD99CE00ACC49A /* iPhoneViewModel.swift */; };
 		DEEB54012AAF2F8400ACC49A /* RoomViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEEB54002AAF2F8400ACC49A /* RoomViewController.swift */; };
@@ -95,7 +95,7 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				DEE666392AAD7A25006F3B04 /* Watch shopping_memo Watch App.app in Embed Watch Content */,
+				DEE666392AAD7A25006F3B04 /* ショッピングメモ.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -123,7 +123,6 @@
 		DE21E7302AB831A200896C3B /* GeneralPurpose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralPurpose.swift; sourceTree = "<group>"; };
 		DE26EAF429E12BFA007AEC11 /* SettingTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingTableViewCell.swift; sourceTree = "<group>"; };
 		DE26EAF529E12BFA007AEC11 /* SettingTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SettingTableViewCell.xib; sourceTree = "<group>"; };
-		DE27F7C125735A3D007250EE /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		DE28F6E1261F270D0074934D /* NotSigninViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotSigninViewController.swift; sourceTree = "<group>"; };
 		DE2F02A62B1C5B4E00AB5ACF /* GuideViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GuideViewController.swift; sourceTree = "<group>"; };
 		DE3DB8282AFB8EAD0032274F /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
@@ -134,13 +133,14 @@
 		DE5CBE312A4475D2009DED0C /* AppVersionCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppVersionCheck.swift; sourceTree = "<group>"; };
 		DE74EA6A2A19BD5600C87A7E /* ReLogInViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReLogInViewController.swift; sourceTree = "<group>"; };
 		DE74EA6C2A19BD9F00C87A7E /* DeleteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeleteViewController.swift; sourceTree = "<group>"; };
+		DE793A782B24451900734994 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		DE9BE8F8293A3CC200992A9F /* CustomTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTableViewCell.swift; sourceTree = "<group>"; };
 		DE9BE8F9293A3CC200992A9F /* CustomTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomTableViewCell.xib; sourceTree = "<group>"; };
 		DE9BE8FC293A4F8D00992A9F /* CustomListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomListCell.swift; sourceTree = "<group>"; };
 		DE9BE8FD293A4F8D00992A9F /* CustomListCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomListCell.xib; sourceTree = "<group>"; };
 		DEC30FC7293E055B006416C2 /* ImageViewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewViewController.swift; sourceTree = "<group>"; };
 		DEE5AC562AEFD0B30082069C /* TransferViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferViewController.swift; sourceTree = "<group>"; };
-		DEE6662C2AAD7A22006F3B04 /* Watch shopping_memo Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Watch shopping_memo Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DEE6662C2AAD7A22006F3B04 /* ショッピングメモ.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ショッピングメモ.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEE6662E2AAD7A22006F3B04 /* Watch_shopping_memoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Watch_shopping_memoApp.swift; sourceTree = "<group>"; };
 		DEE666302AAD7A22006F3B04 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		DEE666322AAD7A25006F3B04 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -226,7 +226,7 @@
 				DE02CB7F2560D79B008012F6 /* shopping_memo.app */,
 				DE02CB952560D79D008012F6 /* shopping_memoTests.xctest */,
 				DE02CBA02560D79D008012F6 /* shopping_memoUITests.xctest */,
-				DEE6662C2AAD7A22006F3B04 /* Watch shopping_memo Watch App.app */,
+				DEE6662C2AAD7A22006F3B04 /* ショッピングメモ.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -272,8 +272,8 @@
 				DEEB53FE2AAD99CE00ACC49A /* iPhoneViewModel.swift */,
 				DE02CB8B2560D79C008012F6 /* Assets.xcassets */,
 				DE02CB8D2560D79C008012F6 /* LaunchScreen.storyboard */,
-				DE27F7C125735A3D007250EE /* GoogleService-Info.plist */,
 				DE02CB902560D79C008012F6 /* Info.plist */,
+				DE793A782B24451900734994 /* GoogleService-Info.plist */,
 			);
 			path = shopping_memo;
 			sourceTree = "<group>";
@@ -403,7 +403,7 @@
 			);
 			name = "Watch shopping_memo Watch App";
 			productName = "Watch shopping_memo Watch App";
-			productReference = DEE6662C2AAD7A22006F3B04 /* Watch shopping_memo Watch App.app */;
+			productReference = DEE6662C2AAD7A22006F3B04 /* ショッピングメモ.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -465,12 +465,12 @@
 				DE02CB8F2560D79C008012F6 /* LaunchScreen.storyboard in Resources */,
 				DE9BE8FF293A4F8D00992A9F /* CustomListCell.xib in Resources */,
 				DE26EAF729E12BFA007AEC11 /* SettingTableViewCell.xib in Resources */,
-				DE27F7C225735A3D007250EE /* GoogleService-Info.plist in Resources */,
 				DE00691C2A84BCAD0096B25F /* NBGShoppingMemoIcon.png in Resources */,
 				DE02CB8C2560D79C008012F6 /* Assets.xcassets in Resources */,
 				DE9BE8FB293A3CC200992A9F /* CustomTableViewCell.xib in Resources */,
 				DEEB540D2AB1F1B900ACC49A /* ImageTableViewCell.xib in Resources */,
 				DEEB54052AAF370C00ACC49A /* RoomTableViewCell.xib in Resources */,
+				DE793A792B24451900734994 /* GoogleService-Info.plist in Resources */,
 				DE02CB8A2560D79B008012F6 /* Main.storyboard in Resources */,
 				DEF2DD362AB9C2D70071DB42 /* SwitchTableViewCell.xib in Resources */,
 			);
@@ -815,13 +815,14 @@
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 85MXHZWC2N;
 				INFOPLIST_FILE = shopping_memo/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "ショッピングメモ";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "app.Kishi.Yuki.shopping-memo";
+				PRODUCT_BUNDLE_IDENTIFIER = app.Kishi.Yuki.shoppingmemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -842,13 +843,14 @@
 				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 85MXHZWC2N;
 				INFOPLIST_FILE = shopping_memo/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "ショッピングメモ";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 2.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "app.Kishi.Yuki.shopping-memo";
+				PRODUCT_BUNDLE_IDENTIFIER = app.Kishi.Yuki.shoppingmemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -950,16 +952,15 @@
 				DEVELOPMENT_TEAM = 85MXHZWC2N;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Watch shopping_memo";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "app.Kishi.Yuki.shopping-memo";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = app.Kishi.Yuki.shoppingmemo;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "app.Kishi.Yuki.shopping-memo.watchkitapp";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = app.Kishi.Yuki.shoppingmemo.watchkitapp;
+				PRODUCT_NAME = "ショッピングメモ";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -981,16 +982,15 @@
 				DEVELOPMENT_TEAM = 85MXHZWC2N;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Watch shopping_memo";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "app.Kishi.Yuki.shopping-memo";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = app.Kishi.Yuki.shoppingmemo;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "app.Kishi.Yuki.shopping-memo.watchkitapp";
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_BUNDLE_IDENTIFIER = app.Kishi.Yuki.shoppingmemo.watchkitapp;
+				PRODUCT_NAME = "ショッピングメモ";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;

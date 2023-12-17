@@ -64,7 +64,7 @@ struct ContentView: View {
                         .foregroundColor(Color.primary)
                         .scaledToFit()
                         .frame(width: 50, height: 50)
-                    Text("データがありません")
+                    Text("表示可能な項目がありません")
                 }
             } else {
                 VStack {

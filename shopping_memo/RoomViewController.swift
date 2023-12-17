@@ -103,8 +103,6 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
                 }
             } else {
                 self.connect = false
-                if self.isFirst { GeneralPurpose.notConnectAlert(VC: self) }
-                self.isFirst = false
             }
         })
     }

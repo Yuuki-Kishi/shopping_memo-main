@@ -14,6 +14,7 @@ class GuideViewController: UIViewController, UIScrollViewDelegate, UIImagePicker
     @IBOutlet var imageV: UIImageView!
     var scrollView: UIScrollView!
     var pageControl: UIPageControl!
+    var connect = false
     
     var administratorImageNameArray = ["titleAdministrator", "makeRoom", "chooseRoom", "makeList", "toMVC", "addMember", "chooseList", "writeMemo", "toIVVC", "uploadImage"]
     var memberImageNameArray = ["titleMember", "toInfo", "readQR", "chooseJoinRoom", "joinRoom", "chooseList", "writeMemo", "toIVVC", "uploadImage"]
@@ -34,88 +35,107 @@ class GuideViewController: UIViewController, UIScrollViewDelegate, UIImagePicker
         let connectedRef = Database.database().reference(withPath: ".info/connected")
         connectedRef.observe(.value, with: { snapshot in
             if snapshot.value as? Bool ?? false {
+                self.connect = true
                 self.storageAdministratorImage()
             } else {
-                GeneralPurpose.notConnectAlert(VC: self)
+                self.connect = false
             }
         })
     }
     
     func storageAdministratorImage() {
-        GeneralPurpose.AIV(VC: self, view: view, status: "start")
-        if administratorImageNameArray.count > administratorImageArray.count {
-            for imageName in administratorImageNameArray {
-                Task {
-                    let image = await getImage(imageName: imageName, folderName: "administrator")
-                    let sortNumber = self.administratorImageNameArray.firstIndex(of: imageName)
-                    administratorImageArray.append((sortNumber: Int(sortNumber!), imageData: image!))
-                    administratorImageArray.sort {$0.sortNumber < $1.sortNumber}
-                    if administratorImageArray.count == administratorImageNameArray.count {
-                        setUpScrollView(count: administratorImageArray.count)
-                        setUpImageView(type: "administrator")
-                        setUpPageControl(count: administratorImageArray.count)
-                        GeneralPurpose.AIV(VC: self, view: view, status: "stop")
+        if connect {
+            let subviews = self.view.subviews
+            for subview in subviews {
+                subview.removeFromSuperview()
+            }
+            GeneralPurpose.AIV(VC: self, view: view, status: "start")
+            if administratorImageNameArray.count > administratorImageArray.count {
+                for imageName in administratorImageNameArray {
+                    Task {
+                        let image = await getImage(imageName: imageName, folderName: "administrator")
+                        let sortNumber = self.administratorImageNameArray.firstIndex(of: imageName)
+                        administratorImageArray.append((sortNumber: Int(sortNumber!), imageData: image!))
+                        administratorImageArray.sort {$0.sortNumber < $1.sortNumber}
+                        if administratorImageArray.count == administratorImageNameArray.count {
+                            setUpScrollView(count: administratorImageArray.count)
+                            setUpImageView(type: "administrator")
+                            setUpPageControl(count: administratorImageArray.count)
+                            GeneralPurpose.AIV(VC: self, view: view, status: "stop")
+                        }
                     }
                 }
+            } else {
+                setUpScrollView(count: administratorImageArray.count)
+                setUpImageView(type: "administrator")
+                setUpPageControl(count: administratorImageArray.count)
+                GeneralPurpose.AIV(VC: self, view: view, status: "stop")
             }
-        } else {
-            setUpScrollView(count: administratorImageArray.count)
-            setUpImageView(type: "administrator")
-            setUpPageControl(count: administratorImageArray.count)
-            GeneralPurpose.AIV(VC: self, view: view, status: "stop")
-        }
+        } else { GeneralPurpose.notConnectAlert(VC: self) }
     }
     
     func storageMemberImage() {
-        GeneralPurpose.AIV(VC: self, view: view, status: "start")
-        if memberImageNameArray.count > memberImageArray.count {
-            for imageName in memberImageNameArray {
-                Task {
-                    let image = await getImage(imageName: imageName, folderName: "member")
-                    let sortNumber = self.memberImageNameArray.firstIndex(of: imageName)
-                    memberImageArray.append((sortNumber: Int(sortNumber!), imageData: image!))
-                    memberImageArray.sort {$0.sortNumber < $1.sortNumber}
-                    print(imageName, sortNumber!, memberImageArray.count)
-                    if memberImageArray.count == memberImageNameArray.count {
-                        setUpScrollView(count: memberImageArray.count)
-                        setUpImageView(type: "member")
-                        setUpPageControl(count: memberImageArray.count)
-                        GeneralPurpose.AIV(VC: self, view: view, status: "stop")
+        if connect {
+            let subviews = self.view.subviews
+            for subview in subviews {
+                subview.removeFromSuperview()
+            }
+            GeneralPurpose.AIV(VC: self, view: view, status: "start")
+            if memberImageNameArray.count > memberImageArray.count {
+                for imageName in memberImageNameArray {
+                    Task {
+                        let image = await getImage(imageName: imageName, folderName: "member")
+                        let sortNumber = self.memberImageNameArray.firstIndex(of: imageName)
+                        memberImageArray.append((sortNumber: Int(sortNumber!), imageData: image!))
+                        memberImageArray.sort {$0.sortNumber < $1.sortNumber}
+                        print(imageName, sortNumber!, memberImageArray.count)
+                        if memberImageArray.count == memberImageNameArray.count {
+                            setUpScrollView(count: memberImageArray.count)
+                            setUpImageView(type: "member")
+                            setUpPageControl(count: memberImageArray.count)
+                            GeneralPurpose.AIV(VC: self, view: view, status: "stop")
+                        }
                     }
                 }
+            } else {
+                setUpScrollView(count: memberImageArray.count)
+                setUpImageView(type: "member")
+                setUpPageControl(count: memberImageArray.count)
+                GeneralPurpose.AIV(VC: self, view: view, status: "stop")
             }
-        } else {
-            setUpScrollView(count: memberImageArray.count)
-            setUpImageView(type: "member")
-            setUpPageControl(count: memberImageArray.count)
-            GeneralPurpose.AIV(VC: self, view: view, status: "stop")
-        }
+        } else { GeneralPurpose.notConnectAlert(VC: self) }
     }
     
     func storageTipsImage() {
-        GeneralPurpose.AIV(VC: self, view: view, status: "start")
-        if tipsImageNameArray.count > tipsImageArray.count {
-            for imageName in tipsImageNameArray {
-                Task {
-                    let image = await getImage(imageName: imageName, folderName: "tips")
-                    let sortNumber = self.tipsImageNameArray.firstIndex(of: imageName)
-                    tipsImageArray.append((sortNumber: Int(sortNumber!), imageData: image!))
-                    tipsImageArray.sort {$0.sortNumber < $1.sortNumber}
-                    print(imageName, sortNumber!, tipsImageArray.count)
-                    if tipsImageArray.count == tipsImageNameArray.count {
-                        setUpScrollView(count: tipsImageArray.count)
-                        setUpImageView(type: "tips")
-                        setUpPageControl(count: tipsImageArray.count)
-                        GeneralPurpose.AIV(VC: self, view: view, status: "stop")
+        if connect {
+            let subviews = self.view.subviews
+            for subview in subviews {
+                subview.removeFromSuperview()
+            }
+            GeneralPurpose.AIV(VC: self, view: view, status: "start")
+            if tipsImageNameArray.count > tipsImageArray.count {
+                for imageName in tipsImageNameArray {
+                    Task {
+                        let image = await getImage(imageName: imageName, folderName: "tips")
+                        let sortNumber = self.tipsImageNameArray.firstIndex(of: imageName)
+                        tipsImageArray.append((sortNumber: Int(sortNumber!), imageData: image!))
+                        tipsImageArray.sort {$0.sortNumber < $1.sortNumber}
+                        print(imageName, sortNumber!, tipsImageArray.count)
+                        if tipsImageArray.count == tipsImageNameArray.count {
+                            setUpScrollView(count: tipsImageArray.count)
+                            setUpImageView(type: "tips")
+                            setUpPageControl(count: tipsImageArray.count)
+                            GeneralPurpose.AIV(VC: self, view: view, status: "stop")
+                        }
                     }
                 }
+            } else {
+                setUpScrollView(count: memberImageArray.count)
+                setUpImageView(type: "member")
+                setUpPageControl(count: memberImageArray.count)
+                GeneralPurpose.AIV(VC: self, view: view, status: "stop")
             }
-        } else {
-            setUpScrollView(count: memberImageArray.count)
-            setUpImageView(type: "member")
-            setUpPageControl(count: memberImageArray.count)
-            GeneralPurpose.AIV(VC: self, view: view, status: "stop")
-        }
+        } else { GeneralPurpose.notConnectAlert(VC: self) }
     }
     
     func getImage(imageName: String, folderName: String) async -> UIImage? {
@@ -192,24 +212,12 @@ class GuideViewController: UIViewController, UIScrollViewDelegate, UIImagePicker
     func menu() {
         let Items = [
             UIAction(title: "管理者編", image: UIImage(systemName: "person.circle"), handler: { _ in
-                let subviews = self.view.subviews
-                for subview in subviews {
-                    subview.removeFromSuperview()
-                }
                 self.storageAdministratorImage()
             }),
             UIAction(title: "メンバー編", image: UIImage(systemName: "person.2.circle"), handler: { _ in
-                let subviews = self.view.subviews
-                for subview in subviews {
-                    subview.removeFromSuperview()
-                }
                 self.storageMemberImage()
             }),
             UIAction(title: "使えると便利編", image: UIImage(systemName: "lightbulb.circle"), handler: { _ in
-                let subviews = self.view.subviews
-                for subview in subviews {
-                    subview.removeFromSuperview()
-                }
                 self.storageTipsImage()
             })
         ]

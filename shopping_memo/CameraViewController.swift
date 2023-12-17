@@ -50,7 +50,6 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         super.viewDidLoad()
         setUpUI()
         setUpData()
-        menu()
         setupPreviewLayer()
         startCamera(isBack: isBack)
         obserbeRealtimeDatabase()
@@ -123,7 +122,6 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         uploadBarButtonItem = UIBarButtonItem(title: "キャンセル", style: .plain, target: self, action: #selector(cancelBarButtonItem(_:)))
         uploadBarButtonItem.tintColor = .tintColor
         navigationItem.leftBarButtonItem = uploadBarButtonItem
-        if #available(iOS 16.0, *) { uploadBarButtonItem.isHidden = true }
     }
     
     func obserbeRealtimeDatabase() {
@@ -192,7 +190,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
         } else {
             imageView.isHidden = true
             setUpChangeCameraReTakeButton()
-            if #available(iOS 16.0, *) { uploadBarButtonItem.isHidden = true }
+            navigationItem.setRightBarButton(nil, animated: true)
             takePhotoButton.isHidden = false
             previewLayerBackgroundView.isHidden = false
             flashModeButton.isHidden = false
@@ -209,7 +207,7 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
             flashModeButton.isHidden = true
             imageView.isHidden = false
             setUpChangeCameraReTakeButton()
-            if #available(iOS 16.0, *) { uploadBarButtonItem.isHidden = false }
+            menu()
             imageView.image = uiImage
         }
     }

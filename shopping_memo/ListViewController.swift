@@ -79,7 +79,6 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
                 self.observeRealtimeDatabase()
             } else {
                 self.connect = false
-                GeneralPurpose.notConnectAlert(VC: self)
             }
         })
     }
@@ -310,7 +309,6 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
                                 } else {
                                     if StorageListResult?.items.count == 0 {
                                         self.ref.child("rooms").child(self.roomIdString).child("lists").child(listId).removeValue()
-                                        GeneralPurpose.updateEditHistory(roomId: self.roomIdString)
                                         GeneralPurpose.AIV(VC: self, view: self.view, status: "stop")
                                     } else {
                                         for ref in StorageListResult!.items {
@@ -323,18 +321,14 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
                                             }
                                         }
                                         self.ref.child("rooms").child(self.roomIdString).child("lists").child(listId).removeValue()
-                                        GeneralPurpose.updateEditHistory(roomId: self.roomIdString)
                                         GeneralPurpose.AIV(VC: self, view: self.view, status: "stop")
                                     }
                                 }
                             })
                         }
-                        self.ref.child("rooms").child(self.roomIdString).child("members").observe(.childAdded, with: { snapshot in
-                            let userId = snapshot.key
-                            self.ref.child("users").child(userId).child("rooms").child(self.roomIdString).removeValue()
-                            self.ref.child("rooms").child(self.roomIdString).removeValue()
-                            self.navigationController?.popViewController(animated: true)
-                        })
+                        self.ref.child("users").child(self.userId).child("rooms").child(self.roomIdString).removeValue()
+                        self.ref.child("rooms").child(self.roomIdString).removeValue()
+                        self.navigationController?.popViewController(animated: true)
                     }))
                     alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
                     self.present(alert, animated: true, completion: nil)

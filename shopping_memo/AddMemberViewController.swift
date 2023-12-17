@@ -37,7 +37,6 @@ class AddMemberViewController: UIViewController, UITableViewDelegate, UITableVie
                 self.setUpAndObserveRealtimeDatabase()
             } else {
                 self.connect = false
-                GeneralPurpose.notConnectAlert(VC: self)
             }
         })
     }

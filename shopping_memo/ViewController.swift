@@ -80,7 +80,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
                 self.observeRealtimeDatabase()
             } else {
                 self.connect = false
-                GeneralPurpose.notConnectAlert(VC: self)
             }
         })
     }

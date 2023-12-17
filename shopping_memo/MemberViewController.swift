@@ -42,7 +42,6 @@ class MemberViewController: UIViewController, UITableViewDelegate, UITableViewDa
                 self.observeRealtimeDatabase()
             } else {
                 self.connect = false
-                GeneralPurpose.notConnectAlert(VC: self)
             }
         })
     }
