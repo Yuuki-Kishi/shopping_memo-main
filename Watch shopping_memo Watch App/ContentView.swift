@@ -88,6 +88,13 @@ struct ContentView: View {
             print("error:", error.localizedDescription)
         }
     }
+    
+    private func resetIsLink() {
+        let messages: [String : Any] = ["request": "reconnect"]
+        self.viewModel.session.sendMessage(messages, replyHandler: nil) { (error) in
+            print("error:", error.localizedDescription)
+        }
+    }
 }
 
 extension ContentView: WatchViewModelDelegate {

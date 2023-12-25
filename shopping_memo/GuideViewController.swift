@@ -131,7 +131,7 @@ class GuideViewController: UIViewController, UIScrollViewDelegate, UIImagePicker
                 }
             } else {
                 setUpScrollView(count: memberImageArray.count)
-                setUpImageView(type: "member")
+                setUpImageView(type: "tips")
                 setUpPageControl(count: memberImageArray.count)
                 GeneralPurpose.AIV(VC: self, view: view, status: "stop")
             }

@@ -844,7 +844,7 @@
 				DEVELOPMENT_TEAM = 85MXHZWC2N;
 				INFOPLIST_FILE = shopping_memo/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "ショッピングメモ";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

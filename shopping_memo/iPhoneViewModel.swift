@@ -35,23 +35,29 @@ extension iPhoneViewModel: WCSessionDelegate {
     }
     
     func sessionReachabilityDidChange(_ session: WCSession) {
-        isReachable = session.isReachable
+        let isReachable = session.isReachable
         self.iPhoneDelegate?.isCanLink(isCanLink: isReachable)
     }
     
     func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
         DispatchQueue.main.async {
             let request = message["request"] as? String ?? ""
-            if request == "check" {
+            switch request {
+            case "check":
                 guard let index = message["index"] as? Int else { return }
                 let indexPath = IndexPath(row: index, section: 0)
                 self.iPhoneDelegate?.check(indexPath: indexPath)
-            } else if request == "getData" {
+            case "getData":
                 self.iPhoneDelegate?.getData()
-            } else if request == "clearData" {
+            case "clearData":
                 self.iPhoneDelegate?.cleared()
-            } else if request == "launched" {
+            case "launched":
                 self.iPhoneDelegate?.isCanLink(isCanLink: true)
+            case "reconnect":
+                print("呼ばれてます!")
+                self.iPhoneDelegate?.reconnect()
+            default:
+                break
             }
         }
     }
@@ -64,4 +70,5 @@ protocol iPhoneViewModelDelegate {
     func getData()
     func cleared()
     func isCanLink(isCanLink: Bool)
+    func reconnect()
 }

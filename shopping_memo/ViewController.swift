@@ -659,6 +659,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
             self.viewModel.session.sendMessage(messages, replyHandler: nil) { (error) in
                 print(error.localizedDescription)
             }
+        } else if notice == "secretClear" {
+            let messages = ["notice": "secretClear"]
+            self.viewModel.session.sendMessage(messages, replyHandler: nil) { (error) in
+                print(error.localizedDescription)
+            }
         } else if notice == "launched" {
             let messages = ["notice": "launched"]
             self.viewModel.session.sendMessage(messages, replyHandler: nil) { (error) in
@@ -830,8 +835,6 @@ extension ViewController: checkMarkDelegete {
                     let memoId = memoArray[indexPath.row].memoId
                     let isChecked = memoArray[indexPath.row].isChecked
                     let cTime = dateFormatter.string(from: Date())
-                    self.memoSortInt = 3
-                    self.userDefaults.set(self.memoSortInt, forKey: "memoSortInt")
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         self.ref.child("rooms").child(self.roomIdString).child("lists").child(self.listIdString).child("memo").child(memoId).updateChildValues(["isChecked": !isChecked, "checkedTime": cTime])
                     }
@@ -848,8 +851,6 @@ extension ViewController: checkMarkDelegete {
                     let memoId = memoArray[indexPath.row].memoId
                     let isChecked = memoArray[indexPath.row].isChecked
                     let cTime = dateFormatter.string(from: Date())
-                    self.memoSortInt = 3
-                    self.userDefaults.set(self.memoSortInt, forKey: "memoSortInt")
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                         self.ref.child("rooms").child(self.roomIdString).child("lists").child(self.listIdString).child("memo").child(memoId).updateChildValues(["isChecked": !isChecked, "checkedTime": cTime])
                     }
@@ -901,6 +902,11 @@ extension ViewController: iPhoneViewModelDelegate {
     func check(indexPath: IndexPath) { buttonPressed(indexPath: indexPath) }
     func getData() { reply() }
     func cleared() { signalCut() }
-    
-    func isCanLink(isCanLink: Bool) { self.isCanLink = isCanLink }
+    func isCanLink(isCanLink: Bool) { self.isCanLink = isCanLink
+        if !self.isCanLink{ self.isLink = false }
+        DispatchQueue.main.async {
+            self.menu()
+        }
+    }
+    func reconnect() { self.isLink = false; menu() }
 }
