@@ -48,7 +48,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
         setUpDelegateAndData()
         UISetUp()
         setUpTableViewAndTextField()
-        menu()
+//        menu()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -902,11 +902,18 @@ extension ViewController: iPhoneViewModelDelegate {
     func check(indexPath: IndexPath) { buttonPressed(indexPath: indexPath) }
     func getData() { reply() }
     func cleared() { signalCut() }
-    func isCanLink(isCanLink: Bool) { self.isCanLink = isCanLink
-        if !self.isCanLink{ self.isLink = false }
+    func isCanLink(isCanLink: Bool) { 
+        self.isCanLink = isCanLink
+        if !self.isCanLink {
+            self.isLink = false
+            DispatchQueue.main.async {
+                let alert: UIAlertController = UIAlertController(title: "AppleWatchとの通信が切断されました。", message: "再使用するには再接続してください。", preferredStyle: .alert)
+                alert.addAction(UIAlertAction(title: "OK", style: .cancel))
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
         DispatchQueue.main.async {
             self.menu()
         }
     }
-    func reconnect() { self.isLink = false; menu() }
 }

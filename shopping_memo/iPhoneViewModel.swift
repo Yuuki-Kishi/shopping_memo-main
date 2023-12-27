@@ -53,9 +53,6 @@ extension iPhoneViewModel: WCSessionDelegate {
                 self.iPhoneDelegate?.cleared()
             case "launched":
                 self.iPhoneDelegate?.isCanLink(isCanLink: true)
-            case "reconnect":
-                print("呼ばれてます!")
-                self.iPhoneDelegate?.reconnect()
             default:
                 break
             }
@@ -70,5 +67,4 @@ protocol iPhoneViewModelDelegate {
     func getData()
     func cleared()
     func isCanLink(isCanLink: Bool)
-    func reconnect()
 }

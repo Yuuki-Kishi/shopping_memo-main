@@ -16,7 +16,9 @@ struct ContentView: View {
     @State var listName: String!
     @State var memoArray = [(memoId: String, shoppingMemo: String, imageUrl: String)]()
     @State var isShowProgressView = false
-    @State var isLinking = false
+    @State var isLink = false
+    
+    @Environment(\.scenePhase) private var scenePhase
     
     var body: some View {
         if !memoArray.isEmpty {
@@ -56,8 +58,14 @@ struct ContentView: View {
                 .navigationTitle(listName)
                 .environment(\.defaultMinListRowHeight, 25)
             }
+            .onChange(of: scenePhase) { phase in
+                if phase == .background {
+                    isLink = false
+                    memoArray = []
+                }
+            }
         } else {
-            if isLinking {
+            if isLink {
                 VStack {
                     Image(systemName: "externaldrive.badge.xmark")
                         .resizable()
@@ -88,18 +96,11 @@ struct ContentView: View {
             print("error:", error.localizedDescription)
         }
     }
-    
-    private func resetIsLink() {
-        let messages: [String : Any] = ["request": "reconnect"]
-        self.viewModel.session.sendMessage(messages, replyHandler: nil) { (error) in
-            print("error:", error.localizedDescription)
-        }
-    }
 }
 
 extension ContentView: WatchViewModelDelegate {
     func reloadData() {
-        isLinking = viewModel.isLink
+        isLink = viewModel.isLink
         listName = viewModel.listName
         memoArray = viewModel.memoArray
         isShowProgressView = false
