@@ -36,6 +36,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
     
     var ref: DatabaseReference!
     var menuBarButtonItem: UIBarButtonItem!
+    var watchLinkButton: UIBarButtonItem!
     var viewModel = iPhoneViewModel()
     
     // String型の配列
@@ -48,12 +49,13 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
         setUpDelegateAndData()
         UISetUp()
         setUpTableViewAndTextField()
-//        menu()
+        menu()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         if !isFirst { observeRealtimeDatabase() }
         isFirst = false
+        sendMessage(notice: "launched")
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -74,7 +76,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
         if userDefaults.bool(forKey: "notSleepSwitch") { UIApplication.shared.isIdleTimerDisabled = true }
         titleTextField.delegate = self
         viewModel.iPhoneDelegate = self
-        sendMessage(notice: "launched")
         let connectedRef = Database.database().reference(withPath: ".info/connected")
         connectedRef.observe(.value, with: { snapshot in
             if snapshot.value as? Bool ?? false {
@@ -182,7 +183,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
             guard let listName = snapshot.childSnapshot(forPath: "listName").value as? String else { return }
             listNameString = listName
             title = listName
-            if isLink { sendMessage(notice: "sendData")}
+            if isLink { sendMessage(notice: "reloadData")}
         })
         //         memoの中身が消えたとき
         ref.child("rooms").child(roomIdString).child("lists").child(listIdString).child("memo").observe(.childRemoved, with: { [self] snapshot in
@@ -518,8 +519,6 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
         } else {
             let checkedTitle: String!
             let checkedImage: UIImage!
-            let watchTitle: String!
-            let watchImage: UIImage!
             let Item1 = [
                 UIAction(title: "五十音順", image: UIImage(systemName: "a.circle"), handler: { _ in
                     self.memoSortInt = 0
@@ -593,21 +592,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
                 self.menu()
                 self.table.reloadData()
             })
-            
-            if isLink {
-                watchTitle = "Apple Watchを切断"
-                watchImage = UIImage(systemName: "applewatch.slash")
-            } else {
-                watchTitle = "Apple Watchに接続"
-                watchImage = UIImage(systemName: "applewatch.radiowaves.left.and.right")
-            }
-            
-            let Item5 = UIAction(title: watchTitle, image: watchImage, handler: { _ in self.watchLink()})
-            
+                        
             let sort1 = UIMenu(title: "未完了を並び替え", image: UIImage(systemName: "square"),  children: Item1)
             let sort2 = UIMenu(title: "完了を並び替え", image: UIImage(systemName: "checkmark.square"), children: Item2)
             
-            let Items = UIMenu(title: "", options: .displayInline, children: [sort1, sort2, Item3, Item4, Item5])
+            let Items = UIMenu(title: "", options: .displayInline, children: [sort1, sort2, Item3, Item4])
             let clear = UIAction(title: "完了項目を削除", image: UIImage(systemName: "trash"), attributes: .destructive, handler: { _ in self.clearChecked()})
             let menu = UIMenu(title: "", image: UIImage(systemName: "ellipsis.circle"), options: .displayInline, children: [Items, clear])
             menuBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "ellipsis.circle"), menu: menu)
@@ -621,7 +610,23 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
         menu()
     }
     
-    func watchLink() {
+    func watchLinkBarButton() {
+        let watchImage: UIImage!
+        if isLink {
+            watchImage = UIImage(systemName: "applewatch.slash")
+        } else {
+            watchImage = UIImage(systemName: "applewatch.radiowaves.left.and.right")
+        }
+        watchLinkButton = UIBarButtonItem(image: watchImage, style: .plain, target: self, action: #selector(watchLink))
+        if isCanLink {
+            watchLinkButton.tintColor = .label
+        } else {
+            watchLinkButton.tintColor = .gray
+        }
+        self.navigationItem.rightBarButtonItems = [menuBarButtonItem, watchLinkButton]
+    }
+    
+    @objc func watchLink() {
         if isCanLink {
             if isLink {
                 let alert: UIAlertController = UIAlertController(title: "Apple Watchとの通信を切断しますか？", message: "再度利用するには再度接続する必要があります。", preferredStyle: .alert)
@@ -675,7 +680,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
     func reply() {
         self.isLink = true
         self.userDefaults.set(self.isLink, forKey: "isLink")
-        menu()
+        watchLinkBarButton()
         GeneralPurpose.AIV(VC: self, view: self.view, status: "stop")
         let alert: UIAlertController = UIAlertController(title: "Apple Watchと接続しました", message: "画面を移動すると接続は切断されます。", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
@@ -685,7 +690,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
     func signalCut() {
         self.isLink = false
         self.userDefaults.set(self.isLink, forKey: "isLink")
-        menu()
+        watchLinkBarButton()
         GeneralPurpose.AIV(VC: self, view: self.view, status: "stop")
         let alert: UIAlertController = UIAlertController(title: "Apple Watchとの通信を切断しました", message: "再度使用するには再度接続してください。", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
@@ -780,7 +785,9 @@ extension ViewController {
         default:
             checkedArray.sort {$0.checkedCount < $1.checkedCount}
         }
-        if isLink { sendMessage(notice: "reloadData") }
+        if isLink {
+            sendMessage(notice: "reloadData")
+        }
         self.table.reloadData()
     }
     
@@ -899,7 +906,11 @@ extension ViewController: imageButtonDelegate {
 }
 
 extension ViewController: iPhoneViewModelDelegate {
-    func check(indexPath: IndexPath) { buttonPressed(indexPath: indexPath) }
+    func check(memoId: String) { 
+        guard let index = memoArray.firstIndex(where: {$0.memoId == memoId}) else { sendMessage(notice: "reloadData"); return }
+        let indexPath = IndexPath(row: index, section: 0)
+        buttonPressed(indexPath: indexPath)
+    }
     func getData() { reply() }
     func cleared() { signalCut() }
     func isCanLink(isCanLink: Bool) { 
@@ -913,7 +924,8 @@ extension ViewController: iPhoneViewModelDelegate {
             }
         }
         DispatchQueue.main.async {
-            self.menu()
+            self.watchLinkBarButton()
         }
     }
+    func reloadData() { sendMessage(notice: "reloadData") }
 }

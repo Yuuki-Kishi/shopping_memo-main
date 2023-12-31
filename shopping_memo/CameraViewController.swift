@@ -48,6 +48,8 @@ class CameraViewController: UIViewController, UIImagePickerControllerDelegate, U
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        menu()
+        navigationItem.setRightBarButton(nil, animated: true)
         setUpUI()
         setUpData()
         setupPreviewLayer()

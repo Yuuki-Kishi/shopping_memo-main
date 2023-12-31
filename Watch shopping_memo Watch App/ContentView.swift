@@ -27,11 +27,12 @@ struct ContentView: View {
                     List {
                         ForEach(Array(memoArray.enumerated()), id: \.element.memoId) { index, memo in
                             //MARK: out of range
+                            let memoId = memo.memoId
                             let shoppingMemo = memo.shoppingMemo
                             let imageUrl = memo.imageUrl
                             HStack {
                                 Button(action: {
-                                    sendMessage(index: index)
+                                    sendMessage(memoId: memoId)
                                     isShowProgressView = true
                                 }){
                                     Image(systemName: "square")
@@ -46,6 +47,19 @@ struct ContentView: View {
                                     Image(systemName: "photo")
                                 }
                             }
+                        }
+                    }
+                    VStack {
+                        Spacer()
+                        HStack {
+                            Spacer()
+                                Button(action: {
+                                    requestReloadData()
+                                }, label: {
+                                    Image(systemName: "arrow.clockwise.circle")
+                                        .font(.system(size: 25.0))
+                                })
+                                .frame(width: 55.0)
                         }
                     }
                     if isShowProgressView {
@@ -66,13 +80,28 @@ struct ContentView: View {
             }
         } else {
             if isLink {
-                VStack {
-                    Image(systemName: "externaldrive.badge.xmark")
-                        .resizable()
-                        .foregroundColor(Color.primary)
-                        .scaledToFit()
-                        .frame(width: 50, height: 50)
-                    Text("表示可能な項目がありません")
+                ZStack {
+                    VStack {
+                        Image(systemName: "externaldrive.badge.xmark")
+                            .resizable()
+                            .foregroundColor(Color.primary)
+                            .scaledToFit()
+                            .frame(width: 50, height: 50)
+                        Text("未完了項目がありません")
+                    }
+                    VStack {
+                        Spacer()
+                        HStack {
+                            Spacer()
+                            Button(action: {
+                                requestReloadData()
+                            }, label: {
+                                Image(systemName: "arrow.clockwise.circle")
+                                    .font(.system(size: 25.0))
+                            })
+                            .frame(width: 55.0)
+                        }
+                    }
                 }
             } else {
                 VStack {
@@ -90,8 +119,15 @@ struct ContentView: View {
         }
     }
     
-    private func sendMessage(index: Int) {
-        let messages: [String : Any] = ["request": "check", "index": index]
+    private func sendMessage(memoId: String) {
+        let messages: [String : Any] = ["request": "check", "memoId": memoId]
+        self.viewModel.session.sendMessage(messages, replyHandler: nil) { (error) in
+            print("error:", error.localizedDescription)
+        }
+    }
+    
+    private func requestReloadData() {
+        let messages:[String : Any] = ["request": "reloadData"]
         self.viewModel.session.sendMessage(messages, replyHandler: nil) { (error) in
             print("error:", error.localizedDescription)
         }
@@ -110,6 +146,6 @@ extension ContentView: WatchViewModelDelegate {
 }
 //struct ContentView_Previews: PreviewProvider {
 //    static var previews: some View {
-//        ContentView(, imageUrl: "aiuu")
+//        ContentView()
 //    }
 //}

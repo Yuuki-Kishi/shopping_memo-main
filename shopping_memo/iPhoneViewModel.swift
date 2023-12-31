@@ -44,15 +44,16 @@ extension iPhoneViewModel: WCSessionDelegate {
             let request = message["request"] as? String ?? ""
             switch request {
             case "check":
-                guard let index = message["index"] as? Int else { return }
-                let indexPath = IndexPath(row: index, section: 0)
-                self.iPhoneDelegate?.check(indexPath: indexPath)
+                guard let memoId = message["memoId"] as? String else { return }
+                self.iPhoneDelegate?.check(memoId: memoId)
             case "getData":
                 self.iPhoneDelegate?.getData()
             case "clearData":
                 self.iPhoneDelegate?.cleared()
             case "launched":
                 self.iPhoneDelegate?.isCanLink(isCanLink: true)
+            case "reloadData":
+                self.iPhoneDelegate?.reloadData()
             default:
                 break
             }
@@ -63,8 +64,9 @@ extension iPhoneViewModel: WCSessionDelegate {
 }
 
 protocol iPhoneViewModelDelegate {
-    func check(indexPath: IndexPath)
+    func check(memoId: String)
     func getData()
     func cleared()
     func isCanLink(isCanLink: Bool)
+    func reloadData()
 }
