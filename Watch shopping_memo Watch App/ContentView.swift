@@ -22,7 +22,7 @@ struct ContentView: View {
     
     var body: some View {
         if !memoArray.isEmpty {
-            NavigationView {
+            NavigationStack {
                 ZStack {
                     List {
                         ForEach(Array(memoArray.enumerated()), id: \.element.memoId) { index, memo in
@@ -53,13 +53,17 @@ struct ContentView: View {
                         Spacer()
                         HStack {
                             Spacer()
-                                Button(action: {
-                                    requestReloadData()
-                                }, label: {
-                                    Image(systemName: "arrow.clockwise.circle")
-                                        .font(.system(size: 25.0))
-                                })
-                                .frame(width: 55.0)
+                            Button(action: {
+                                requestReloadData()
+                            }, label: {
+                                Image(systemName: "arrow.clockwise.circle")
+                                    .font(.system(size: 20.0))
+                            })
+                            .foregroundColor(.black)
+                            .background(Color.accentColor)
+                            .frame(width: 35.0, height: 35.0)
+                            .clipShape(RoundedRectangle(cornerRadius: 17.5))
+                            .padding()
                         }
                     }
                     if isShowProgressView {
@@ -97,9 +101,13 @@ struct ContentView: View {
                                 requestReloadData()
                             }, label: {
                                 Image(systemName: "arrow.clockwise.circle")
-                                    .font(.system(size: 25.0))
+                                    .font(.system(size: 20.0))
                             })
-                            .frame(width: 55.0)
+                            .foregroundColor(.black)
+                            .background(Color.accentColor)
+                            .frame(width: 35.0, height: 35.0)
+                            .clipShape(RoundedRectangle(cornerRadius: 17.5))
+                            .padding()
                         }
                     }
                 }
