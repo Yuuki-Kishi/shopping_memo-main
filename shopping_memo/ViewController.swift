@@ -389,6 +389,9 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
                 } else if self.memoArray.isEmpty {
                     memoId = self.checkedArray[indexPath.row].memoId
                     alertTextField.text = self.checkedArray[index].shoppingMemo
+                } else {
+                    memoId = self.memoArray[indexPath.row].memoId
+                    alertTextField.text = self.memoArray[index].shoppingMemo
                 }
             }
             
