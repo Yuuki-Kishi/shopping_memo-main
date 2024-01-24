@@ -17,98 +17,117 @@ struct ContentView: View {
     @State var memoArray = [(memoId: String, shoppingMemo: String, imageUrl: String)]()
     @State var isShowProgressView = false
     @State var isLink = false
+    @State var isBackground = false
     
     @Environment(\.scenePhase) private var scenePhase
     
     var body: some View {
-        if !memoArray.isEmpty {
-            NavigationStack {
-                ZStack {
-                    List {
-                        ForEach(Array(memoArray.enumerated()), id: \.element.memoId) { index, memo in
-                            //MARK: out of range
-                            let memoId = memo.memoId
-                            let shoppingMemo = memo.shoppingMemo
-                            let imageUrl = memo.imageUrl
+        if !isBackground {
+            if isLink {
+                if memoArray.isEmpty {
+                    ZStack {
+                        VStack {
+                            Image(systemName: "externaldrive.badge.xmark")
+                                .resizable()
+                                .foregroundColor(Color.primary)
+                                .scaledToFit()
+                                .frame(width: 50, height: 50)
+                            Text("未完了項目がありません")
+                        }
+                        VStack {
+                            Spacer()
                             HStack {
-                                Button(action: {
-                                    sendMessage(memoId: memoId)
-                                    isShowProgressView = true
-                                }){
-                                    Image(systemName: "square")
-                                        .foregroundColor(.white)
-                                }
-                                .frame(width: 30, height: 25)
-                                Text(shoppingMemo)
                                 Spacer()
-                                if imageUrl == "" {
-                                    Image(systemName: "plus.viewfinder")
-                                } else {
-                                    Image(systemName: "photo")
-                                }
+                                Button(action: {
+                                    requestReloadData()
+                                }, label: {
+                                    Image(systemName: "arrow.clockwise.circle")
+                                        .font(.system(size: 20.0))
+                                })
+                                .foregroundColor(.black)
+                                .background(Color.accentColor)
+                                .frame(width: 35.0, height: 35.0)
+                                .clipShape(RoundedRectangle(cornerRadius: 17.5))
+                                .padding()
                             }
                         }
                     }
-                    VStack {
-                        Spacer()
-                        HStack {
-                            Spacer()
-                            Button(action: {
-                                requestReloadData()
-                            }, label: {
-                                Image(systemName: "arrow.clockwise.circle")
-                                    .font(.system(size: 20.0))
-                            })
-                            .foregroundColor(.black)
-                            .background(Color.accentColor)
-                            .frame(width: 35.0, height: 35.0)
-                            .clipShape(RoundedRectangle(cornerRadius: 17.5))
-                            .padding()
+                    .onChange(of: scenePhase) { phase in
+                        if phase == .background {
+                            isBackground = true
+                        } else if phase == .active {
+                            isBackground = false
                         }
                     }
-                    if isShowProgressView {
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                            .scaleEffect(1.5)
-                            .tint(Color.white)
+                    .onAppear {
+                        viewModel.watchDelegate = self
+                        requestReloadData()
                     }
-                }
-                .navigationTitle(listName)
-                .environment(\.defaultMinListRowHeight, 25)
-            }
-            .onChange(of: scenePhase) { phase in
-                if phase == .background {
-                    isLink = false
-                    memoArray = []
-                }
-            }
-        } else {
-            if isLink {
-                ZStack {
-                    VStack {
-                        Image(systemName: "externaldrive.badge.xmark")
-                            .resizable()
-                            .foregroundColor(Color.primary)
-                            .scaledToFit()
-                            .frame(width: 50, height: 50)
-                        Text("未完了項目がありません")
-                    }
-                    VStack {
-                        Spacer()
-                        HStack {
-                            Spacer()
-                            Button(action: {
-                                requestReloadData()
-                            }, label: {
-                                Image(systemName: "arrow.clockwise.circle")
-                                    .font(.system(size: 20.0))
-                            })
-                            .foregroundColor(.black)
-                            .background(Color.accentColor)
-                            .frame(width: 35.0, height: 35.0)
-                            .clipShape(RoundedRectangle(cornerRadius: 17.5))
-                            .padding()
+                } else {
+                    NavigationStack {
+                        ZStack {
+                            List {
+                                ForEach(Array(memoArray.enumerated()), id: \.element.memoId) { index, memo in
+                                    //MARK: out of range
+                                    let memoId = memo.memoId
+                                    let shoppingMemo = memo.shoppingMemo
+                                    let imageUrl = memo.imageUrl
+                                    HStack {
+                                        Button(action: {
+                                            sendMessage(memoId: memoId)
+                                            isShowProgressView = true
+                                        }){
+                                            Image(systemName: "square")
+                                                .foregroundColor(.white)
+                                        }
+                                        .frame(width: 30, height: 25)
+                                        Text(shoppingMemo)
+                                        Spacer()
+                                        if imageUrl == "" {
+                                            Image(systemName: "plus.viewfinder")
+                                        } else {
+                                            Image(systemName: "photo")
+                                        }
+                                    }
+                                }
+                            }
+                            VStack {
+                                Spacer()
+                                HStack {
+                                    Spacer()
+                                    Button(action: {
+                                        requestReloadData()
+                                    }, label: {
+                                        Image(systemName: "arrow.clockwise.circle")
+                                            .font(.system(size: 20.0))
+                                    })
+                                    .foregroundColor(.black)
+                                    .background(Color.accentColor)
+                                    .frame(width: 35.0, height: 35.0)
+                                    .clipShape(RoundedRectangle(cornerRadius: 17.5))
+                                    .padding()
+                                }
+                            }
+                            if isShowProgressView {
+                                ProgressView()
+                                    .progressViewStyle(.circular)
+                                    .scaleEffect(1.5)
+                                    .tint(Color.white)
+                            }
                         }
+                        .navigationTitle(listName)
+                        .environment(\.defaultMinListRowHeight, 25)
+                    }
+                    .onChange(of: scenePhase) { phase in
+                        if phase == .background {
+                            isBackground = true
+                        } else if phase == .active {
+                            isBackground = false
+                        }
+                    }
+                    .onAppear {
+                        viewModel.watchDelegate = self
+                        requestReloadData()
                     }
                 }
             } else {
@@ -120,8 +139,31 @@ struct ContentView: View {
                         .frame(width: 50, height: 50)
                     Text("接続準備完了")
                 }
+                .onChange(of: scenePhase) { phase in
+                    if phase == .background {
+                        isBackground = true
+                    } else if phase == .active {
+                        isBackground = false
+                    }
+                }
                 .onAppear {
                     viewModel.watchDelegate = self
+                }
+            }
+        } else {
+            VStack {
+                Image(systemName: "iphone.gen3.radiowaves.left.and.right")
+                    .resizable()
+                    .foregroundColor(Color.primary)
+                    .scaledToFit()
+                    .frame(width: 50, height: 50)
+                Text("接続準備完了")
+            }
+            .onChange(of: scenePhase) { phase in
+                if phase == .background {
+                    isBackground = true
+                } else if phase == .active {
+                    isBackground = false
                 }
             }
         }

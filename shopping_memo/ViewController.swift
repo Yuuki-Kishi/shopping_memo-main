@@ -493,6 +493,20 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
                         // 実行結果に関わらず記述
                         completionHandler(true)
                     }
+                } else {
+                    let memoId = self.memoArray[indexPath.row].memoId
+                    if self.memoArray.count == 1 {
+                        self.ref.child("rooms").child(self.roomIdString).child("lists").child(self.listIdString).child("memo").child(memoId).removeValue()
+                        self.memoArray.remove(at: indexPath.row)
+                        tableView.deleteSections([0], with: UITableView.RowAnimation.automatic)
+                        completionHandler(true)
+                    } else {
+                        self.ref.child("rooms").child(self.roomIdString).child("lists").child(self.listIdString).child("memo").child(memoId).removeValue()
+                        self.memoArray.remove(at: indexPath.row)
+                        tableView.deleteRows(at: [indexPath as IndexPath], with: UITableView.RowAnimation.automatic)
+                        // 実行結果に関わらず記述
+                        completionHandler(true)
+                    }
                 }
                 self.removeSwitch = false
                 self.userDefaults.set(self.removeSwitch, forKey: "removeSwitch")
@@ -919,16 +933,34 @@ extension ViewController: iPhoneViewModelDelegate {
     func isCanLink(isCanLink: Bool) { 
         self.isCanLink = isCanLink
         if !self.isCanLink {
-            self.isLink = false
-            DispatchQueue.main.async {
-                let alert: UIAlertController = UIAlertController(title: "AppleWatchとの通信が切断されました。", message: "再使用するには再接続してください。", preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .cancel))
-                self.present(alert, animated: true, completion: nil)
+            if isLink {
+                DispatchQueue.main.async {
+                    let alert: UIAlertController = UIAlertController(title: "AppleWatchとの通信が切断されました", message: "再使用するには再接続してください。", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .cancel))
+                    self.present(alert, animated: true, completion: nil)
+                }
+            }
+        } else {
+            if isLink {
+                DispatchQueue.main.async {
+                    let alert: UIAlertController = UIAlertController(title: "AppleWatchとの通信が再開されました", message: "そのままご使用いただけます。", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "OK", style: .cancel))
+                    self.present(alert, animated: true, completion: nil)
+                }
+            } else {
+                self.isCanLink = true
             }
         }
         DispatchQueue.main.async {
             self.watchLinkBarButton()
         }
     }
-    func reloadData() { sendMessage(notice: "reloadData") }
+    func reloadData() {
+        self.isCanLink = true
+        self.isLink = true
+        DispatchQueue.main.async {
+            self.watchLinkBarButton()
+        }
+        sendMessage(notice: "reloadData")
+    }
 }
