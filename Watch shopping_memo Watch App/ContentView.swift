@@ -60,6 +60,7 @@ struct ContentView: View {
                         }
                     }
                     .onAppear {
+                        self.isLink = UserDefaults.standard.bool(forKey: "isLink")
                         viewModel.watchDelegate = self
                         requestReloadData()
                     }
@@ -126,6 +127,7 @@ struct ContentView: View {
                         }
                     }
                     .onAppear {
+                        self.isLink = UserDefaults.standard.bool(forKey: "isLink")
                         viewModel.watchDelegate = self
                         requestReloadData()
                     }
@@ -147,6 +149,7 @@ struct ContentView: View {
                     }
                 }
                 .onAppear {
+                    self.isLink = UserDefaults.standard.bool(forKey: "isLink")
                     viewModel.watchDelegate = self
                 }
             }
