@@ -46,7 +46,6 @@ extension WatchViewModel: WCSessionDelegate {
                 }
                 self.listName = listName
                 self.isLink = true
-                UserDefaults.standard.set(self.isLink, forKey: "isLink")
                 self.watchDelegate?.reloadData()
                 if notice == "sendData" {
                     let messages: [String : Any] = ["request": "getData"]

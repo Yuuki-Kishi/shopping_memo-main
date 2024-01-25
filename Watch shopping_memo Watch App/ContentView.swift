@@ -60,7 +60,6 @@ struct ContentView: View {
                         }
                     }
                     .onAppear {
-                        self.isLink = UserDefaults.standard.bool(forKey: "isLink")
                         viewModel.watchDelegate = self
                         requestReloadData()
                     }
@@ -127,19 +126,25 @@ struct ContentView: View {
                         }
                     }
                     .onAppear {
-                        self.isLink = UserDefaults.standard.bool(forKey: "isLink")
                         viewModel.watchDelegate = self
                         requestReloadData()
                     }
                 }
             } else {
+                let AppVer = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
                 VStack {
+                    Spacer()
                     Image(systemName: "iphone.gen3.radiowaves.left.and.right")
                         .resizable()
                         .foregroundColor(Color.primary)
                         .scaledToFit()
                         .frame(width: 50, height: 50)
                     Text("接続準備完了")
+                    Spacer()
+                    HStack {
+                        Spacer()
+                        Text("Version: " + AppVer!)
+                    }
                 }
                 .onChange(of: scenePhase) { phase in
                     if phase == .background {
@@ -149,18 +154,24 @@ struct ContentView: View {
                     }
                 }
                 .onAppear {
-                    self.isLink = UserDefaults.standard.bool(forKey: "isLink")
                     viewModel.watchDelegate = self
                 }
             }
         } else {
+            let AppVer = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String
             VStack {
+                Spacer()
                 Image(systemName: "iphone.gen3.radiowaves.left.and.right")
                     .resizable()
                     .foregroundColor(Color.primary)
                     .scaledToFit()
                     .frame(width: 50, height: 50)
                 Text("接続準備完了")
+                Spacer()
+                HStack {
+                    Spacer()
+                    Text("Version: " + AppVer!)
+                }
             }
             .onChange(of: scenePhase) { phase in
                 if phase == .background {
