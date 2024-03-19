@@ -69,25 +69,14 @@ struct ContentView: View {
                             List {
                                 ForEach(Array(memoArray.enumerated()), id: \.element.memoId) { index, memo in
                                     //MARK: out of range
-                                    let memoId = memo.memoId
-                                    let shoppingMemo = memo.shoppingMemo
-                                    let imageUrl = memo.imageUrl
-                                    HStack {
-                                        Button(action: {
-                                            sendMessage(memoId: memoId)
-                                            isShowProgressView = true
-                                        }){
-                                            Image(systemName: "square")
-                                                .foregroundColor(.white)
-                                        }
-                                        .frame(width: 30, height: 25)
-                                        Text(shoppingMemo)
-                                        Spacer()
-                                        if imageUrl == "" {
-                                            Image(systemName: "plus.viewfinder")
-                                        } else {
-                                            Image(systemName: "photo")
-                                        }
+                                    Button(action: {
+                                        sendMessage(memoId: memo.memoId)
+                                        isShowProgressView = true
+                                    }){
+                                        Text(memo.shoppingMemo)
+                                            .foregroundColor(.primary)
+                                            .font(.system(size: 20.0))
+                                            .lineLimit(1)
                                     }
                                 }
                             }

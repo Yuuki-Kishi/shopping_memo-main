@@ -582,7 +582,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
                 })
             ]
             
-            let Item3 = UIAction(title: "メモを並び替え", image: UIImage(systemName: "list.bullet"), handler: { _ in
+            let Item3 = UIAction(title: "手動で並び替え", handler: { _ in
                 if self.connect {
                     self.table.isEditing = true
                     self.menu()
@@ -610,10 +610,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
                 self.table.reloadData()
             })
                         
-            let sort1 = UIMenu(title: "未完了を並び替え", image: UIImage(systemName: "square"),  children: Item1)
-            let sort2 = UIMenu(title: "完了を並び替え", image: UIImage(systemName: "checkmark.square"), children: Item2)
+            let sort1 = UIMenu(title: "未完了を並び替え",  children: Item1)
+            let sort2 = UIMenu(title: "完了を並び替え", children: Item2)
+            let sorts = UIMenu(title: "並び替え", image: UIImage(systemName: "arrow.up.arrow.down"), children: [sort1, sort2, Item3])
             
-            let Items = UIMenu(title: "", options: .displayInline, children: [sort1, sort2, Item3, Item4])
+            let Items = UIMenu(title: "", options: .displayInline, children: [sorts, Item4])
             let clear = UIAction(title: "完了項目を削除", image: UIImage(systemName: "trash"), attributes: .destructive, handler: { _ in self.clearChecked()})
             let menu = UIMenu(title: "", image: UIImage(systemName: "ellipsis.circle"), options: .displayInline, children: [Items, clear])
             menuBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "ellipsis.circle"), menu: menu)

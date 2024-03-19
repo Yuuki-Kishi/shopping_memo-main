@@ -443,7 +443,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
             let Items = UIMenu(title: "", options: .displayInline, children: [
                 UIAction(title: "ルーム名を変更", image: UIImage(systemName: "arrow.triangle.2.circlepath"), handler: { _ in self.roomNameChange()}),
                 UIAction(title: "メンバーの確認・変更", image: UIImage(systemName: "person.2.fill"), handler: { _ in GeneralPurpose.segue(VC: self, id: "toMVC", connect: self.connect)}),
-                UIAction(title: "リストを並び替え", image: UIImage(systemName: "list.bullet"), handler: { _ in
+                UIAction(title: "リストを並び替え", image: UIImage(systemName: "arrow.up.arrow.down"), handler: { _ in
                     if !self.listArray.isEmpty {
                         if self.connect {
                             self.tableView.isEditing = true
