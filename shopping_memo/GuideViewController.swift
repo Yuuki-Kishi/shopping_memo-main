@@ -18,7 +18,7 @@ class GuideViewController: UIViewController, UIScrollViewDelegate, UIImagePicker
     
     var administratorImageNameArray = ["titleAdministrator", "makeRoom", "chooseRoom", "makeList", "toMVC", "addMember", "chooseList", "writeMemo", "toIVVC", "uploadImage"]
     var memberImageNameArray = ["titleMember", "toInfo", "readQR", "chooseJoinRoom", "joinRoom", "chooseList", "writeMemo", "toIVVC", "uploadImage"]
-    var tipsImageNameArray = ["titleTips", "roomMenu", "myInfo", "listMenu", "explainMemoScreen", "memoMenu"]
+    var tipsImageNameArray = ["titleTips", "roomMenu", "myInfo", "listMenu", "explainMemoScreen", "memoMenu", "watch"]
     var administratorImageArray = [(sortNumber: Int, imageData: UIImage)]()
     var memberImageArray = [(sortNumber: Int, imageData: UIImage)]()
     var tipsImageArray = [(sortNumber: Int, imageData: UIImage)]()
