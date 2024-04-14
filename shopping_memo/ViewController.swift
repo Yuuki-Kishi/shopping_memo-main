@@ -917,6 +917,10 @@ extension ViewController: imageButtonDelegate {
                 self.memoIdString = checkedArray[indexPath.row].memoId
                 self.shoppingMemoName = checkedArray[indexPath.row].shoppingMemo
                 self.imageUrlString = checkedArray[indexPath.row].imageUrl
+            } else {
+                self.memoIdString = memoArray[indexPath.row].memoId
+                self.shoppingMemoName = memoArray[indexPath.row].shoppingMemo
+                self.imageUrlString = memoArray[indexPath.row].imageUrl
             }
         }
         GeneralPurpose.segue(VC: self, id: "toIVVC", connect: self.connect)

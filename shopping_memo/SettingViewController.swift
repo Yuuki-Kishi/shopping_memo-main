@@ -179,7 +179,7 @@ class SettingViewController: UIViewController, UITableViewDelegate, UITableViewD
     
     func makeQRImage(str: String) -> UIImage {
         let data = str.data(using: String.Encoding.utf8)!
-        let qr = CIFilter(name: "CIQRCodeGenerator", parameters: ["inputMessage": data, "inputCorrectionLevel": "M"])!
+        let qr = CIFilter(name: "CIQRCodeGenerator", parameters: ["inputMessage": data, "inputCorrectionLevel": "L"])!
         let sizeTransform = CGAffineTransform(scaleX: 10, y: 10)
         let qrImage = qr.outputImage!.transformed(by: sizeTransform)
         let context = CIContext()
