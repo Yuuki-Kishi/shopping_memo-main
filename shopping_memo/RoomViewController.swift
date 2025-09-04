@@ -403,7 +403,10 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
         let Item2 = UIAction(title: "操作説明", image: UIImage(systemName: "questionmark.circle"), handler: { _ in
             GeneralPurpose.segue(VC: self, id: "toGVC", connect: self.connect)
         })
-        let Items = UIMenu(title: "", options: .displayInline, children: [Item1, Item2])
+        let Item3 = UIAction(title: "通知一覧", image: UIImage(systemName: "bell"), handler: { _ in
+            GeneralPurpose.segue(VC: self, id: "toNLVC", connect: self.connect)
+        })
+        let Items = UIMenu(title: "", options: .displayInline, children: [Item1, Item2, Item3])
         let signOut = UIAction(title: "サインアウト", image: UIImage(systemName: "door.right.hand.open"), attributes: .destructive, handler: { _ in self.signOut()})
         let menu = UIMenu(title: "", image: UIImage(systemName: "ellipsis.circle"), children: [Items, signOut])
         signOutBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "ellipsis.circle"), menu: menu)

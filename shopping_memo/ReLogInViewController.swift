@@ -154,7 +154,7 @@ class ReLogInViewController: UIViewController, ASAuthorizationControllerDelegate
                 return
             }
             // Initialize a Firebase credential.
-            let credential = OAuthProvider.credential(withProviderID: "apple.com", idToken: idTokenString, rawNonce: nonce)
+            let credential = OAuthProvider.appleCredential(withIDToken: "apple.com", rawNonce: nonce, fullName: appleIDCredential.fullName)
             // Sign in with Firebase.
             Auth.auth().signIn(with: credential) { (authResult, error) in
                 if let error = error {
