@@ -32,6 +32,7 @@
 		DE9BE8FB293A3CC200992A9F /* CustomTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE9BE8F9293A3CC200992A9F /* CustomTableViewCell.xib */; };
 		DE9BE8FE293A4F8D00992A9F /* CustomListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9BE8FC293A4F8D00992A9F /* CustomListCell.swift */; };
 		DE9BE8FF293A4F8D00992A9F /* CustomListCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = DE9BE8FD293A4F8D00992A9F /* CustomListCell.xib */; };
+		DE9D58F32E6ABED500E879C9 /* NoticeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE9D58F22E6ABED500E879C9 /* NoticeViewController.swift */; };
 		DEC30FC8293E055B006416C2 /* ImageViewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEC30FC7293E055B006416C2 /* ImageViewViewController.swift */; };
 		DEDF27302E698F91008AD96A /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = DEDF272F2E698F91008AD96A /* FirebaseAuth */; };
 		DEDF27322E698F91008AD96A /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = DEDF27312E698F91008AD96A /* FirebaseCore */; };
@@ -134,6 +135,7 @@
 		DE9BE8F9293A3CC200992A9F /* CustomTableViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomTableViewCell.xib; sourceTree = "<group>"; };
 		DE9BE8FC293A4F8D00992A9F /* CustomListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomListCell.swift; sourceTree = "<group>"; };
 		DE9BE8FD293A4F8D00992A9F /* CustomListCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomListCell.xib; sourceTree = "<group>"; };
+		DE9D58F22E6ABED500E879C9 /* NoticeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeViewController.swift; sourceTree = "<group>"; };
 		DEC30FC7293E055B006416C2 /* ImageViewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageViewViewController.swift; sourceTree = "<group>"; };
 		DEDF273A2E69AD49008AD96A /* NoticeListViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoticeListViewCell.swift; sourceTree = "<group>"; };
 		DEDF273B2E69AD49008AD96A /* NoticeListViewCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NoticeListViewCell.xib; sourceTree = "<group>"; };
@@ -249,6 +251,7 @@
 				DE74EA6A2A19BD5600C87A7E /* ReLogInViewController.swift */,
 				DE74EA6C2A19BD9F00C87A7E /* DeleteViewController.swift */,
 				DE48A87E2E60B3A9008C6FF2 /* NoticeListViewController.swift */,
+				DE9D58F22E6ABED500E879C9 /* NoticeViewController.swift */,
 				DE02CB882560D79B008012F6 /* Main.storyboard */,
 				DEEB54022AAF370C00ACC49A /* RoomTableViewCell.swift */,
 				DEEB54032AAF370C00ACC49A /* RoomTableViewCell.xib */,
@@ -574,6 +577,7 @@
 				DE74EA6B2A19BD5600C87A7E /* ReLogInViewController.swift in Sources */,
 				DEEB54092AB0C01100ACC49A /* MemberViewController.swift in Sources */,
 				DE21E7312AB831A200896C3B /* GeneralPurpose.swift in Sources */,
+				DE9D58F32E6ABED500E879C9 /* NoticeViewController.swift in Sources */,
 				DE59AB1A2B0B923A00023948 /* RelayViewController.swift in Sources */,
 				DE02CB872560D79B008012F6 /* ViewController.swift in Sources */,
 				DEDF273C2E69AD49008AD96A /* NoticeListViewCell.swift in Sources */,

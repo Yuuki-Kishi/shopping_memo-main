@@ -937,11 +937,66 @@
                     <connections>
                         <outlet property="noCellLabel" destination="Txl-d5-0Bq" id="9gQ-ni-5lJ"/>
                         <outlet property="tableView" destination="1uP-e0-zlJ" id="HVG-vu-Z3q"/>
+                        <segue destination="8K2-ey-YDK" kind="show" identifier="toNVC" id="Fmy-QK-fpL"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="kwp-w4-vk2" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-474" y="-2127"/>
+        </scene>
+        <!--Notice View Controller-->
+        <scene sceneID="X3G-Xe-Xzo">
+            <objects>
+                <viewController id="8K2-ey-YDK" customClass="NoticeViewController" customModule="shopping_memo" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="0Ek-Xn-EuY">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bUe-9D-kNy">
+                                <rect key="frame" x="16" y="194" width="361" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="2025/09/05 15:00:00" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aMk-5D-1Dq">
+                                <rect key="frame" x="16" y="232" width="361" height="18"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" text="TextView" translatesAutoresizingMaskIntoConstraints="NO" id="BTf-mV-HWV">
+                                <rect key="frame" x="16" y="282" width="361" height="502"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <color key="textColor" systemColor="labelColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="ThN-Zw-79V"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="bUe-9D-kNy" firstAttribute="leading" secondItem="ThN-Zw-79V" secondAttribute="leading" constant="16" id="35l-lZ-xcq"/>
+                            <constraint firstItem="BTf-mV-HWV" firstAttribute="bottom" secondItem="ThN-Zw-79V" secondAttribute="bottom" id="3Pl-4f-Wwk"/>
+                            <constraint firstItem="bUe-9D-kNy" firstAttribute="top" secondItem="ThN-Zw-79V" secondAttribute="top" constant="32" id="Fu6-gB-IW2"/>
+                            <constraint firstItem="aMk-5D-1Dq" firstAttribute="leading" secondItem="ThN-Zw-79V" secondAttribute="leading" constant="16" id="O0D-pH-pCE"/>
+                            <constraint firstItem="BTf-mV-HWV" firstAttribute="top" secondItem="aMk-5D-1Dq" secondAttribute="bottom" constant="32" id="RPy-5T-B3X"/>
+                            <constraint firstItem="ThN-Zw-79V" firstAttribute="trailing" secondItem="bUe-9D-kNy" secondAttribute="trailing" constant="16" id="Sgk-Na-PkB"/>
+                            <constraint firstItem="ThN-Zw-79V" firstAttribute="trailing" secondItem="BTf-mV-HWV" secondAttribute="trailing" constant="16" id="fUH-CT-itf"/>
+                            <constraint firstItem="BTf-mV-HWV" firstAttribute="leading" secondItem="ThN-Zw-79V" secondAttribute="leading" constant="16" id="i5G-qu-ec3"/>
+                            <constraint firstItem="aMk-5D-1Dq" firstAttribute="top" secondItem="bUe-9D-kNy" secondAttribute="bottom" constant="8" symbolic="YES" id="m2c-qP-gqX"/>
+                            <constraint firstItem="ThN-Zw-79V" firstAttribute="trailing" secondItem="aMk-5D-1Dq" secondAttribute="trailing" constant="16" id="wW0-V7-scc"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="r57-QY-Jiz"/>
+                    <connections>
+                        <outlet property="contentTextView" destination="BTf-mV-HWV" id="Wd5-CL-HN5"/>
+                        <outlet property="creationTimeLabel" destination="aMk-5D-1Dq" id="jT6-bV-H3u"/>
+                        <outlet property="titleLabel" destination="bUe-9D-kNy" id="rzM-gm-Bov"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="HTN-T9-AlC" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="406.87022900763355" y="-2127.4647887323945"/>
         </scene>
         <!--Not Signin View Controller-->
         <scene sceneID="Gez-MU-iG2">

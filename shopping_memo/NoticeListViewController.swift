@@ -13,7 +13,8 @@ class NoticeListViewController: UIViewController, UITableViewDelegate, UITableVi
     @IBOutlet var tableView: UITableView!
     @IBOutlet var noCellLabel: UILabel!
     
-    var alertArray = [(alertId: String, alertTitle: String, alertMessage: String, alertContent: String, creationTime: Date, isAlert: Bool, minVersion: Double, maxVersion: Double)]()
+    var alertArray = [(alertId: String, alertTitle: String, alertMessage: String, content: String, creationTime: Date, isAlert: Bool, minVersion: Double, maxVersion: Double)]()
+    var tappedIndex: Int!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,15 +40,16 @@ class NoticeListViewController: UIViewController, UITableViewDelegate, UITableVi
                 let documentData = document.data()
                 guard let alertTitle = documentData["alertTitle"] as? String else { continue }
                 guard let alertMessage = documentData["alertMessage"] as? String else { continue }
-                guard let alertContent = documentData["alertContent"] as? String else { continue }
+                guard let alertContent = documentData["content"] as? String else { continue }
                 guard let creationTimeString = documentData["creationTime"] as? String else { continue }
                 let formatter = ISO8601DateFormatter()
                 guard let creationTime = formatter.date(from: creationTimeString) else { continue }
                 guard let isAlert = documentData["isAlert"] as? Bool else { continue }
                 guard let minVersion = documentData["minVersion"] as? Double else { continue }
                 guard let maxVersion = documentData["maxVersion"] as? Double else { continue }
-                self.alertArray.append((alertId: alertId, alertTitle: alertTitle, alertMessage: alertMessage, alertContent: alertContent, creationTime: creationTime, isAlert: isAlert, minVersion: minVersion, maxVersion: maxVersion))
+                self.alertArray.append((alertId: alertId, alertTitle: alertTitle, alertMessage: alertMessage, content: alertContent, creationTime: creationTime, isAlert: isAlert, minVersion: minVersion, maxVersion: maxVersion))
             }
+            self.alertArray.sort { $0.creationTime > $1.creationTime }
             self.tableView.reloadData()
             GeneralPurpose.AIV(VC: self, view: self.view, status: "stop")
         }
@@ -82,10 +84,26 @@ class NoticeListViewController: UIViewController, UITableViewDelegate, UITableVi
         dateFormatter.timeZone = .current
         dateFormatter.dateStyle = .medium
         dateFormatter.timeStyle = .medium
-        cell.titleLabel.text = alertArray[indexPath.row].alertTitle
-        let creationTime = alertArray[indexPath.row].creationTime
+        cell.titleLabel.text = alertArray[indexPath.section].alertTitle
+        let creationTime = alertArray[indexPath.section].creationTime
         let creationTimeString = dateFormatter.string(from: creationTime)
         cell.timeLabel.text = creationTimeString
+        cell.accessoryType = .disclosureIndicator
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        tappedIndex = indexPath.section
+        GeneralPurpose.segue(VC: self, id: "toNVC", connect: true)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "toNVC" {
+            let next = segue.destination as! NoticeViewController
+            next.alertTitle = alertArray[tappedIndex].alertTitle
+            next.creationTime = alertArray[tappedIndex].creationTime
+            next.content = alertArray[tappedIndex].content
+        }
     }
 }
