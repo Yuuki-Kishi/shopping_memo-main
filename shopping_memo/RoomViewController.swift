@@ -203,7 +203,7 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
         ref.child("users").child(oldUserId).observe(.childAdded, with: { [self] snapshot in
             let listId = snapshot.key
             guard let listName = snapshot.childSnapshot(forPath: "name").value as? String else { return }
-            ref.child("users").child(userId!).child(listId).updateChildValues(["listName": listName])
+            ref.child("users").child(userId!).child(listId).updateChildValues(["name": listName])
             ref.child("users").child(oldUserId).child(listId).child("name").removeValue()
             ref.child("users").child(oldUserId).child(listId).child("未チェック").observe(.childAdded, with: { [self] snapshot in
                 let memoId = snapshot.key
@@ -271,9 +271,10 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func relayFinish() {
         GeneralPurpose.AIV(VC: self, view: self.view, status: "stop")
-        let alert: UIAlertController = UIAlertController(title: "引き継ぎが完了しました", message: "以前のアカウントのデータは削除されました。アプリを再起動してください。", preferredStyle: .alert)
+        let alert: UIAlertController = UIAlertController(title: "引き継ぎが完了しました", message: "以前のアカウントのデータは削除されました。画面右下のボタンからルームを作成してください。", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
             self.userDefaults.removeObject(forKey: "userId")
+            self.observeRealtimeDatabase()
         }))
         self.present(alert, animated: true, completion:  nil)
     }
@@ -385,9 +386,9 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
                         self.dateFormatter.locale = Locale(identifier: "en_US_POSIX")
                         self.dateFormatter.timeZone = TimeZone(identifier: "UTC")
                         let date = self.dateFormatter.string(from: Date())
-                        self.ref.child("users").child(self.userId).child("rooms").updateChildValues(["room\(date)": "administrator"])
                         self.ref.child("rooms").child("room\(date)").child("info").updateChildValues(["roomName": text, "lastEditTime": date, "lastEditor": self.userId!])
                         self.ref.child("rooms").child("room\(date)").child("members").child(self.userId!).updateChildValues(["authority": "administrator", "email": email!])
+                        self.ref.child("users").child(self.userId).child("rooms").updateChildValues(["room\(date)": "administrator"])
                         textField.text = ""
                     }}))}
             self.present(alert, animated: true, completion: nil)
