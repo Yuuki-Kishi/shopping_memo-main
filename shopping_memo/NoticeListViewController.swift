@@ -47,6 +47,7 @@ class NoticeListViewController: UIViewController, UITableViewDelegate, UITableVi
                 guard let isAlert = documentData["isAlert"] as? Bool else { continue }
                 guard let minVersion = documentData["minVersion"] as? Double else { continue }
                 guard let maxVersion = documentData["maxVersion"] as? Double else { continue }
+                if creationTime > Date() { continue }
                 self.alertArray.append((alertId: alertId, alertTitle: alertTitle, alertMessage: alertMessage, content: alertContent, creationTime: creationTime, isAlert: isAlert, minVersion: minVersion, maxVersion: maxVersion))
             }
             self.alertArray.sort { $0.creationTime > $1.creationTime }

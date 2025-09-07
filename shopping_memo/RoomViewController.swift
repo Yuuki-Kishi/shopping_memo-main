@@ -9,6 +9,7 @@ import UIKit
 import FirebaseAuth
 import FirebaseDatabase
 import FirebaseStorage
+import FirebaseFirestore
 
 class RoomViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
@@ -30,6 +31,8 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
     var guestArray = [(roomId: String, roomName: String, lastEditTime: Date, lastEditorName: String, authority: String)]()
     var signOutBarButtonItem: UIBarButtonItem!
     
+    var alertArray = [(alertId: String, alertTitle: String, alertMessage: String, content: String, creationTime: Date, isAlert: Bool, minVersion: Double, maxVersion: Double)]()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpData()
@@ -41,6 +44,7 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
     override func viewWillAppear(_ animated: Bool) {
         if !isFirst { observeRealtimeDatabase() }
         isFirst = false
+        checkNotices()
     }
     
     func tableViewSetUp() {
@@ -71,10 +75,10 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
             let userName = snapshot.childSnapshot(forPath: "userName").value as? String
             if email == nil {
                 email = Auth.auth().currentUser?.email
-                self.ref.child("users").child(self.userId).child("metadata").updateChildValues(["email": email!])
+                ref.child("users").child(userId).child("metadata").updateChildValues(["email": email!])
             }
             if userName == nil || userName == "未設定" {
-                self.ref.child("users").child(self.userId).child("metadata").updateChildValues(["userName": "未設定"])
+                ref.child("users").child(userId).child("metadata").updateChildValues(["userName": "未設定"])
                 var alertTextField: UITextField!
                 let alert: UIAlertController = UIAlertController(title: "ユーザーネームが未設定です", message: "ユーザーネームは後で設定することもできます。", preferredStyle: .alert)
                 alert.addTextField { textField in
@@ -279,6 +283,56 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
         self.present(alert, animated: true, completion:  nil)
     }
     
+    func checkNotices() {
+        ref.child("users").child(userId).child("metadata").observeSingleEvent(of: .value, with: { [self] snapshot in
+            let lastUsedTimeString = snapshot.childSnapshot(forPath: "lastUsedTime").value as? String
+            Firestore.firestore().collection("alerts").getDocuments { [self] snapshot, error in
+                guard let documents = snapshot?.documents else { return }
+                for document in documents {
+                    let alertId = document.documentID
+                    let documentData = document.data()
+                    guard let alertTitle = documentData["alertTitle"] as? String else { continue }
+                    guard let alertMessage = documentData["alertMessage"] as? String else { continue }
+                    guard let alertContent = documentData["content"] as? String else { continue }
+                    guard let creationTimeString = documentData["creationTime"] as? String else { continue }
+                    let formatter = ISO8601DateFormatter()
+                    guard let creationTime = formatter.date(from: creationTimeString) else { continue }
+                    guard let isAlert = documentData["isAlert"] as? Bool else { continue }
+                    guard let minVersion = documentData["minVersion"] as? Double else { continue }
+                    guard let maxVersion = documentData["maxVersion"] as? Double else { continue }
+                    if creationTime > Date() { continue }
+                    alertArray.append((alertId: alertId, alertTitle: alertTitle, alertMessage: alertMessage, content: alertContent, creationTime: creationTime, isAlert: isAlert, minVersion: minVersion, maxVersion: maxVersion))
+                }
+                alertArray.sort { $0.creationTime > $1.creationTime }
+                if lastUsedTimeString == nil {
+                    guard let alertNotice = alertArray.filter({ $0.isAlert }).first else { return }
+                    showAlert(alertTitle: alertNotice.alertTitle, alertMessage: alertNotice.alertMessage)
+                } else {
+                    dateFormatter.dateFormat = "yyyyMMddHHmmssSSS"
+                    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+                    dateFormatter.timeZone = TimeZone(identifier: "UTC")
+                    let lastUsedTime = dateFormatter.date(from: lastUsedTimeString!)
+                    guard let alertNotice = alertArray.filter({ $0.isAlert && $0.creationTime > lastUsedTime! }).first else { return }
+                    showAlert(alertTitle: alertNotice.alertTitle, alertMessage: alertNotice.alertMessage)
+                }
+            }
+        })
+    }
+    
+    func showAlert(alertTitle: String, alertMessage: String) {
+        let alert: UIAlertController = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "見に行く", style: .default, handler: { _ in
+            self.dateFormatter.dateFormat = "yyyyMMddHHmmssSSS"
+            self.dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+            self.dateFormatter.timeZone = TimeZone(identifier: "UTC")
+            let now = self.dateFormatter.string(from: Date())
+            self.ref.child("users").child(self.userId).child("metadata").updateChildValues(["lastUsedTime": now])
+            GeneralPurpose.segue(VC: self, id: "toNLVC", connect: true)
+        }))
+        alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel, handler: { _ in }))
+        self.present(alert, animated: true, completion:  nil)
+    }
+    
     func numberOfSections(in tableView: UITableView) -> Int {
         roomArray = guestArray + otherArray
         if roomArray.isEmpty { noCellLabel.isHidden = false }
@@ -304,7 +358,7 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "RoomTableViewCell") as! RoomTableViewCell
-        dateFormatter.locale = Locale(identifier: "ja_JP")
+        dateFormatter.locale = .autoupdatingCurrent
         dateFormatter.timeZone = .current
         dateFormatter.dateStyle = .medium
         dateFormatter.timeStyle = .medium
