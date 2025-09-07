@@ -35,18 +35,21 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setUpData()
         tableViewSetUp()
         menu()
         UISetUp()
-        checkAppVer()
+        ref = Database.database().reference()
+        userId = Auth.auth().currentUser?.uid
+        checkIsMaintanance()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         if !isFirst { observeRealtimeDatabase() }
         isFirst = false
-        checkAppVer()
-        checkNotices()
+        if userDefaults.string(forKey: "userId") == nil {
+            checkNotices()
+            checkAppVer()
+        }
     }
     
     func tableViewSetUp() {
@@ -65,13 +68,68 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
         plusButton.layer.shadowOffset = CGSize(width: 0, height: 5)
         noCellLabel.adjustsFontSizeToFitWidth = true
         noCellLabel.isHidden = true
-        if let userId = userDefaults.string(forKey: "userId") { moveData(oldUserId: userId) }
+    }
+    
+    func checkIsMaintanance() {
+        Firestore.firestore().collection("DBInfo").document("Maintenance").getDocument { [self] snapshot, error in
+            guard let startTimeString = snapshot?.get("startTime") as? String else { return }
+            guard let endTimeString = snapshot?.get("endTime") as? String else { return }
+            let formatter = ISO8601DateFormatter()
+            guard let startTime = formatter.date(from: startTimeString) else { return }
+            guard let endTime = formatter.date(from: endTimeString) else { return }
+            let now = Date()
+            var isMaintenance = false
+            if startTime <= now && now <= endTime { isMaintenance = true }
+            if isMaintenance {
+                dateFormatter.dateFormat = "MM/dd HH:mm"
+                dateFormatter.timeZone = .autoupdatingCurrent
+                dateFormatter.locale = .autoupdatingCurrent
+                let displayStartTimeString = dateFormatter.string(from: startTime)
+                let displayEndTimeString = dateFormatter.string(from: endTime)
+                let message = "\(displayStartTimeString)から\(displayEndTimeString)はメンテナンス中です。\nこれ以降に再度お試しください。\nなお、終了時刻は繰り上がる場合があります。"
+                let alert: UIAlertController = UIAlertController(title: "現在メンテナンス中です", message: message, preferredStyle: .alert)
+                self.present(alert, animated: true, completion: nil)
+            } else {
+                setUpData()
+            }
+        }
     }
     
     func setUpData() {
-        ref = Database.database().reference()
-        userId = Auth.auth().currentUser?.uid
-        
+        let connectedRef = Database.database().reference(withPath: ".info/connected")
+        connectedRef.observe(.value, with: { snapshot in
+            if snapshot.value as? Bool ?? false {
+                self.connect = true
+            } else {
+                self.connect = false
+            }
+        })
+        if let oldUserId = self.userDefaults.string(forKey: "userId") {
+            self.moveData(oldUserId: oldUserId)
+        } else {
+            self.observeRealtimeDatabase()
+        }
+    }
+    
+    func checkAppVer() {
+        let AppVer = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
+        self.ref.child("users").child(userId).child("metadata").updateChildValues(["currentVersion": AppVer])
+        Task {
+            let result = await AppVersionCheck.appVersionCheck()
+            if result {
+                DispatchQueue.main.async {
+                    let url = URL(string: "https://itunes.apple.com/jp/app/apple-store/id6448711012")!
+                    let alert: UIAlertController = UIAlertController(title: "古いバージョンです", message: "AppStoreから更新してください。", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "更新する", style: .default, handler: { action in
+                        UIApplication.shared.open(url, options: [:]) { success in
+                            if success {print("成功!")}}}))
+                    self.present(alert, animated: true, completion: nil)
+                }
+            }
+        }
+    }
+    
+    func checkUserName() {
         ref.child("users").child(userId).child("metadata").observeSingleEvent(of: .value, with: { [self] snapshot in
             var email = snapshot.childSnapshot(forPath: "email").value as? String
             let userName = snapshot.childSnapshot(forPath: "userName").value as? String
@@ -97,38 +155,6 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
                 self.present(alert, animated: true, completion: nil)
             }
         })
-        
-        let connectedRef = Database.database().reference(withPath: ".info/connected")
-        connectedRef.observe(.value, with: { snapshot in
-            if snapshot.value as? Bool ?? false {
-                self.connect = true
-                if let oldUserId = self.userDefaults.string(forKey: "userId") {
-                    self.moveData(oldUserId: oldUserId)
-                } else {
-                    self.observeRealtimeDatabase()
-                }
-            } else {
-                self.connect = false
-            }
-        })
-    }
-    
-    func checkAppVer() {
-        let AppVer = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
-        self.ref.child("users").child(userId).child("metadata").updateChildValues(["remainVersion": AppVer])
-        Task {
-            let result = await AppVersionCheck.appVersionCheck()
-            if result {
-                DispatchQueue.main.async {
-                    let url = URL(string: "https://itunes.apple.com/jp/app/apple-store/id6448711012")!
-                    let alert: UIAlertController = UIAlertController(title: "古いバージョンです", message: "AppStoreから更新してください。", preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: "更新する", style: .default, handler: { action in
-                        UIApplication.shared.open(url, options: [:]) { success in
-                            if success {print("成功!")}}}))
-                    self.present(alert, animated: true, completion: nil)
-                }
-            }
-        }
     }
     
     func observeRealtimeDatabase() {
@@ -305,7 +331,7 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
     
     func checkNotices() {
         ref.child("users").child(userId).child("metadata").observeSingleEvent(of: .value, with: { [self] snapshot in
-            let lastUsedTimeString = snapshot.childSnapshot(forPath: "lastUsedTime").value as? String
+            let lastUsedTimeString = snapshot.childSnapshot(forPath: "noticeCheckedTime").value as? String
             Firestore.firestore().collection("alerts").getDocuments { [self] snapshot, error in
                 guard let documents = snapshot?.documents else { return }
                 for document in documents {
@@ -332,7 +358,10 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
                     dateFormatter.locale = Locale(identifier: "en_US_POSIX")
                     dateFormatter.timeZone = TimeZone(identifier: "UTC")
                     let lastUsedTime = dateFormatter.date(from: lastUsedTimeString!)
-                    guard let alertNotice = alertArray.filter({ $0.isAlert && $0.creationTime > lastUsedTime! }).first else { return }
+                    guard let alertNotice = alertArray.filter({ $0.isAlert && $0.creationTime > lastUsedTime! }).first else {
+                        checkUserName()
+                        return
+                    }
                     showAlert(alertTitle: alertNotice.alertTitle, alertMessage: alertNotice.alertMessage)
                 }
             }
@@ -346,7 +375,7 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
             self.dateFormatter.locale = Locale(identifier: "en_US_POSIX")
             self.dateFormatter.timeZone = TimeZone(identifier: "UTC")
             let now = self.dateFormatter.string(from: Date())
-            self.ref.child("users").child(self.userId).child("metadata").updateChildValues(["lastUsedTime": now])
+            self.ref.child("users").child(self.userId).child("metadata").updateChildValues(["noticeCheckedTime": now])
             GeneralPurpose.segue(VC: self, id: "toNLVC", connect: true)
         }))
         alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
