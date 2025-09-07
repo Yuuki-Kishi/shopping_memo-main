@@ -39,11 +39,13 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
         tableViewSetUp()
         menu()
         UISetUp()
+        checkAppVer()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         if !isFirst { observeRealtimeDatabase() }
         isFirst = false
+        checkAppVer()
         checkNotices()
     }
     
@@ -109,6 +111,24 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
                 self.connect = false
             }
         })
+    }
+    
+    func checkAppVer() {
+        let AppVer = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "unknown"
+        self.ref.child("users").child(userId).child("metadata").updateChildValues(["remainVersion": AppVer])
+        Task {
+            let result = await AppVersionCheck.appVersionCheck()
+            if result {
+                DispatchQueue.main.async {
+                    let url = URL(string: "https://itunes.apple.com/jp/app/apple-store/id6448711012")!
+                    let alert: UIAlertController = UIAlertController(title: "古いバージョンです", message: "AppStoreから更新してください。", preferredStyle: .alert)
+                    alert.addAction(UIAlertAction(title: "更新する", style: .default, handler: { action in
+                        UIApplication.shared.open(url, options: [:]) { success in
+                            if success {print("成功!")}}}))
+                    self.present(alert, animated: true, completion: nil)
+                }
+            }
+        }
     }
     
     func observeRealtimeDatabase() {
@@ -329,7 +349,7 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
             self.ref.child("users").child(self.userId).child("metadata").updateChildValues(["lastUsedTime": now])
             GeneralPurpose.segue(VC: self, id: "toNLVC", connect: true)
         }))
-        alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel, handler: { _ in }))
+        alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
         self.present(alert, animated: true, completion:  nil)
     }
     

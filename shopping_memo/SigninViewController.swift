@@ -72,7 +72,6 @@ class SigninViewController: UIViewController, ASAuthorizationControllerDelegate,
                     alert.addAction(UIAlertAction(title: "更新する", style: .default, handler: { action in
                         UIApplication.shared.open(url, options: [:]) { success in
                             if success {print("成功!")}}}))
-                    alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
                     self.present(alert, animated: true, completion: nil)
                 }
             }
