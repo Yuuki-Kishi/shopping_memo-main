@@ -7,6 +7,7 @@
 
 import UIKit
 import FirebaseDatabase
+import FirebaseFirestore
 import FirebaseAuth
 import FirebaseStorage
 
@@ -22,7 +23,7 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
     var imageUrlString: String!
     var imageRef: StorageReference!
     var ref: DatabaseReference!
-    let df = DateFormatter()
+    let dateFormatter = DateFormatter()
     let userDefaults: UserDefaults = UserDefaults.standard
     let storage = Storage.storage()
     var connect = false
@@ -33,6 +34,7 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
         super.viewDidLoad()
         UISetUp()
         setUpData()
+        checkIsMaintanance()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -64,6 +66,27 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
                 self.connect = false
             }
         })
+    }
+    
+    func checkIsMaintanance() {
+        Firestore.firestore().collection("DBInfo").document("Maintenance").addSnapshotListener { [self]  querySnapshot, error in
+            guard let startTimeString = querySnapshot?.get("startTime") as? String else { return }
+            guard let endTimeString = querySnapshot?.get("endTime") as? String else { return }
+            guard let isMaintenance = querySnapshot?.get("isMaintenance") as? Bool else { return }
+            let formatter = ISO8601DateFormatter()
+            guard let startTime = formatter.date(from: startTimeString) else { return }
+            guard let endTime = formatter.date(from: endTimeString) else { return }
+            if isMaintenance {
+                dateFormatter.dateFormat = "MM/dd HH:mm"
+                dateFormatter.timeZone = .autoupdatingCurrent
+                dateFormatter.locale = .autoupdatingCurrent
+                let displayStartTimeString = dateFormatter.string(from: startTime)
+                let displayEndTimeString = dateFormatter.string(from: endTime)
+                let message = "\(displayStartTimeString)から\(displayEndTimeString)はメンテナンス中です。\nこれ以降に再度お試しください。\nなお、終了時刻は繰り上がる場合があります。"
+                let alert: UIAlertController = UIAlertController(title: "現在メンテナンス中です", message: message, preferredStyle: .alert)
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
     }
     
     func observeRealtimeDatabase() {
@@ -101,10 +124,10 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
                         print(error)
                     } else {
                         let date = metadata?.timeCreated
-                        df.locale = Locale(identifier: "ja_JP")
-                        df.dateStyle = .medium
-                        df.timeStyle = .medium
-                        upDateLabel.text = " 最終更新日時:" + df.string(from: date!) + " "
+                        dateFormatter.locale = Locale(identifier: "ja_JP")
+                        dateFormatter.dateStyle = .medium
+                        dateFormatter.timeStyle = .medium
+                        upDateLabel.text = " 最終更新日時:" + dateFormatter.string(from: date!) + " "
                     }
                 }
             }
@@ -140,10 +163,10 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
                         print(error)
                     } else {
                         let date = metadata?.timeCreated
-                        df.locale = Locale(identifier: "ja_JP")
-                        df.dateStyle = .medium
-                        df.timeStyle = .medium
-                        upDateLabel.text = " 最終更新日時:" + df.string(from: date!) + " "
+                        dateFormatter.locale = Locale(identifier: "ja_JP")
+                        dateFormatter.dateStyle = .medium
+                        dateFormatter.timeStyle = .medium
+                        upDateLabel.text = " 最終更新日時:" + dateFormatter.string(from: date!) + " "
                     }
                 }
             }
@@ -175,7 +198,7 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
         })
     }
     
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+    func imagePickerController(_ picker: UIImagePickerController, didateFormatterinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         //.originalImageにするとトリミングなしになる
         guard let image = info[.originalImage] as? UIImage else { return }
         guard let imageData = image.jpegData(compressionQuality: 0.3) /*as? UIImage*/ else { return }
@@ -192,7 +215,7 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
                     guard let downloadURL = url else { return }
                     let imageUrl = downloadURL.absoluteString
                     self.ref.child("rooms").child(self.roomIdString).child("lists").child(self.listIdString).child("memo").child(memoId).updateChildValues(["imageUrl": imageUrl])
-                    GeneralPurpose.updateEditHistory(roomId: self.roomIdString)
+                    GeneralPurpose.updateEditHistory(roomId: self.roomIdString, listId: self.listIdString)
                 }
             }
         }
@@ -229,7 +252,7 @@ class ImageViewViewController: UIViewController, UIImagePickerControllerDelegate
                         print(error)
                     } else {
                         self.ref.child("rooms").child(self.roomIdString).child("lists").child(self.listIdString).child("memo").child(memoId).updateChildValues(["imageUrl": ""])
-                        GeneralPurpose.updateEditHistory(roomId: self.roomIdString)
+                        GeneralPurpose.updateEditHistory(roomId: self.roomIdString, listId: self.listIdString)
                         self.imageView.contentMode = .center
                         self.imageView.preferredSymbolConfiguration = .init(pointSize: 100)
                         self.imageView.image = UIImage(systemName: "photo")

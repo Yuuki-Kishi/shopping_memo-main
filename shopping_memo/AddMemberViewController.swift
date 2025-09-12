@@ -8,6 +8,7 @@
 import UIKit
 import FirebaseAuth
 import FirebaseDatabase
+import FirebaseFirestore
 
 class AddMemberViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
@@ -30,6 +31,7 @@ class AddMemberViewController: UIViewController, UITableViewDelegate, UITableVie
         tableView.delegate = self
         tableView.dataSource = self
         addButton.layer.cornerRadius = 18.0
+        checkIsMaintanance()
         let connectedRef = Database.database().reference(withPath: ".info/connected")
         connectedRef.observe(.value, with: { snapshot in
             if snapshot.value as? Bool ?? false {
@@ -39,6 +41,27 @@ class AddMemberViewController: UIViewController, UITableViewDelegate, UITableVie
                 self.connect = false
             }
         })
+    }
+    
+    func checkIsMaintanance() {
+        Firestore.firestore().collection("DBInfo").document("Maintenance").addSnapshotListener { [self]  querySnapshot, error in
+            guard let startTimeString = querySnapshot?.get("startTime") as? String else { return }
+            guard let endTimeString = querySnapshot?.get("endTime") as? String else { return }
+            guard let isMaintenance = querySnapshot?.get("isMaintenance") as? Bool else { return }
+            let formatter = ISO8601DateFormatter()
+            guard let startTime = formatter.date(from: startTimeString) else { return }
+            guard let endTime = formatter.date(from: endTimeString) else { return }
+            if isMaintenance {
+                dateFormatter.dateFormat = "MM/dd HH:mm"
+                dateFormatter.timeZone = .autoupdatingCurrent
+                dateFormatter.locale = .autoupdatingCurrent
+                let displayStartTimeString = dateFormatter.string(from: startTime)
+                let displayEndTimeString = dateFormatter.string(from: endTime)
+                let message = "\(displayStartTimeString)から\(displayEndTimeString)はメンテナンス中です。\nこれ以降に再度お試しください。\nなお、終了時刻は繰り上がる場合があります。"
+                let alert: UIAlertController = UIAlertController(title: "現在メンテナンス中です", message: message, preferredStyle: .alert)
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
     }
     
     func setUpAndObserveRealtimeDatabase() {

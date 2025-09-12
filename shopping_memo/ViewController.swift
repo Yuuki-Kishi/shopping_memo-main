@@ -7,6 +7,7 @@
 
 import UIKit
 import FirebaseDatabase
+import FirebaseFirestore
 import FirebaseAuth
 
 class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelegate, UITableViewDelegate {
@@ -49,6 +50,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
         setUpDelegateAndData()
         UISetUp()
         setUpTableViewAndTextField()
+        checkIsMaintanance()
         menu()
     }
     
@@ -102,6 +104,27 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
         table.estimatedSectionHeaderHeight = 0.0
         table.estimatedSectionFooterHeight = 0.0
         table.register(UINib(nibName: "CustomTableViewCell", bundle: .main), forCellReuseIdentifier: "CustomTableViewCell")
+    }
+    
+    func checkIsMaintanance() {
+        Firestore.firestore().collection("DBInfo").document("Maintenance").addSnapshotListener { [self]  querySnapshot, error in
+            guard let startTimeString = querySnapshot?.get("startTime") as? String else { return }
+            guard let endTimeString = querySnapshot?.get("endTime") as? String else { return }
+            guard let isMaintenance = querySnapshot?.get("isMaintenance") as? Bool else { return }
+            let formatter = ISO8601DateFormatter()
+            guard let startTime = formatter.date(from: startTimeString) else { return }
+            guard let endTime = formatter.date(from: endTimeString) else { return }
+            if isMaintenance {
+                dateFormatter.dateFormat = "MM/dd HH:mm"
+                dateFormatter.timeZone = .autoupdatingCurrent
+                dateFormatter.locale = .autoupdatingCurrent
+                let displayStartTimeString = dateFormatter.string(from: startTime)
+                let displayEndTimeString = dateFormatter.string(from: endTime)
+                let message = "\(displayStartTimeString)から\(displayEndTimeString)はメンテナンス中です。\nこれ以降に再度お試しください。\nなお、終了時刻は繰り上がる場合があります。"
+                let alert: UIAlertController = UIAlertController(title: "現在メンテナンス中です", message: message, preferredStyle: .alert)
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
     }
     
     func observeRealtimeDatabase() {
@@ -399,7 +422,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
                 if alertTextField.text != "" {
                     let text = alertTextField.text!
                     self.ref.child("rooms").child(self.roomIdString).child("lists").child(self.listIdString).child("memo").child(memoId).updateChildValues(["shoppingMemo": text])
-                    GeneralPurpose.updateEditHistory(roomId: self.roomIdString)
+                    GeneralPurpose.updateEditHistory(roomId: self.roomIdString, listId: self.listIdString)
                 }}))
             alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
             self.present(alert, animated: true, completion: nil)
@@ -420,7 +443,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
             } else {
                 self.ref.child("rooms").child(roomIdString).child("lists").child(listIdString).child("memo").child("memo\(time)").updateChildValues(["memoCount": -1, "checkedCount": 0, "shoppingMemo": titleTextField.text!, "isChecked": false, "dateNow": time, "checkedTime": time, "imageUrl": ""])
                 titleTextField.text = ""
-                GeneralPurpose.updateEditHistory(roomId: roomIdString)
+                GeneralPurpose.updateEditHistory(roomId: roomIdString, listId: listIdString)
             }
         } else {
             GeneralPurpose.notConnectAlert(VC: self)
@@ -510,7 +533,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITextFieldDelega
                 }
                 self.removeSwitch = false
                 self.userDefaults.set(self.removeSwitch, forKey: "removeSwitch")
-                GeneralPurpose.updateEditHistory(roomId: self.roomIdString)
+                GeneralPurpose.updateEditHistory(roomId: self.roomIdString, listId: self.listIdString)
                 self.table.reloadData()
             }
         }
@@ -762,7 +785,7 @@ extension ViewController {
                 memoArraySort()
             }
         }
-        GeneralPurpose.updateEditHistory(roomId: roomIdString)
+        GeneralPurpose.updateEditHistory(roomId: roomIdString, listId: listIdString)
     }
     
     func memoArraySort() {
@@ -821,7 +844,7 @@ extension ViewController {
                         self.ref.child("rooms").child(self.roomIdString).child("lists").child(self.listIdString).child("memo").child(memoId).removeValue()
                     }
                     self.checkedArray.removeAll()
-                    GeneralPurpose.updateEditHistory(roomId: self.roomIdString)
+                    GeneralPurpose.updateEditHistory(roomId: self.roomIdString, listId: self.listIdString)
                     self.table.reloadData()
                 }))
                 alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))
@@ -888,6 +911,7 @@ extension ViewController: checkMarkDelegete {
                     }
                 }
             }
+            GeneralPurpose.updateEditHistory(roomId: self.roomIdString, listId: self.listIdString)
         } else {
             GeneralPurpose.notConnectAlert(VC: self)
             table.reloadData()

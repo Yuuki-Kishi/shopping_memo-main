@@ -40,6 +40,7 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
         UISetUp()
         ref = Database.database().reference()
         userId = Auth.auth().currentUser?.uid
+        setUpData()
         checkIsMaintanance()
     }
     
@@ -71,15 +72,13 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func checkIsMaintanance() {
-        Firestore.firestore().collection("DBInfo").document("Maintenance").getDocument { [self] snapshot, error in
-            guard let startTimeString = snapshot?.get("startTime") as? String else { return }
-            guard let endTimeString = snapshot?.get("endTime") as? String else { return }
+        Firestore.firestore().collection("DBInfo").document("Maintenance").addSnapshotListener { [self]  querySnapshot, error in
+            guard let startTimeString = querySnapshot?.get("startTime") as? String else { return }
+            guard let endTimeString = querySnapshot?.get("endTime") as? String else { return }
+            guard let isMaintenance = querySnapshot?.get("isMaintenance") as? Bool else { return }
             let formatter = ISO8601DateFormatter()
             guard let startTime = formatter.date(from: startTimeString) else { return }
             guard let endTime = formatter.date(from: endTimeString) else { return }
-            let now = Date()
-            var isMaintenance = false
-            if startTime <= now && now <= endTime { isMaintenance = true }
             if isMaintenance {
                 dateFormatter.dateFormat = "MM/dd HH:mm"
                 dateFormatter.timeZone = .autoupdatingCurrent
@@ -89,8 +88,6 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
                 let message = "\(displayStartTimeString)から\(displayEndTimeString)はメンテナンス中です。\nこれ以降に再度お試しください。\nなお、終了時刻は繰り上がる場合があります。"
                 let alert: UIAlertController = UIAlertController(title: "現在メンテナンス中です", message: message, preferredStyle: .alert)
                 self.present(alert, animated: true, completion: nil)
-            } else {
-                setUpData()
             }
         }
     }
@@ -371,11 +368,6 @@ class RoomViewController: UIViewController, UITableViewDelegate, UITableViewData
     func showAlert(alertTitle: String, alertMessage: String) {
         let alert: UIAlertController = UIAlertController(title: alertTitle, message: alertMessage, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "見に行く", style: .default, handler: { _ in
-            self.dateFormatter.dateFormat = "yyyyMMddHHmmssSSS"
-            self.dateFormatter.locale = Locale(identifier: "en_US_POSIX")
-            self.dateFormatter.timeZone = TimeZone(identifier: "UTC")
-            let now = self.dateFormatter.string(from: Date())
-            self.ref.child("users").child(self.userId).child("metadata").updateChildValues(["noticeCheckedTime": now])
             GeneralPurpose.segue(VC: self, id: "toNLVC", connect: true)
         }))
         alert.addAction(UIAlertAction(title: "キャンセル", style: .cancel))

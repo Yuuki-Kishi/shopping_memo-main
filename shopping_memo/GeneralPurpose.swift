@@ -22,12 +22,15 @@ class GeneralPurpose {
         VC.present(alert, animated: true)
     }
     
-    static func updateEditHistory(roomId: String) {
+    static func updateEditHistory(roomId: String, listId: String = "") {
         dateFormatter.dateFormat = "yyyyMMddHHmmssSSS"
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
         dateFormatter.timeZone = TimeZone(identifier: "UTC")
         let timeNow = dateFormatter.string(from: Date())
         let editor = Auth.auth().currentUser?.uid
+        if listId != "" {
+            ref.child("rooms").child(roomId).child("lists").child(listId).child("info").updateChildValues(["lastEditTime": timeNow, "lastEditor": editor!])
+        }
         ref.child("rooms").child(roomId).child("info").updateChildValues(["lastEditTime": timeNow, "lastEditor": editor!])
     }
     

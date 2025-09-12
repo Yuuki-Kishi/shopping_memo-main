@@ -8,6 +8,7 @@
 import UIKit
 import FirebaseAuth
 import FirebaseDatabase
+import FirebaseFirestore
 import FirebaseStorage
 
 class ListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
@@ -36,6 +37,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
         UISetUp()
         setUpTableView()
         setUpData()
+        checkIsMaintanance()
         moveData()
     }
     
@@ -71,7 +73,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
             myAuthority = authority
             menu()
         })
-        
+                
         let connectedRef = Database.database().reference(withPath: ".info/connected")
         connectedRef.observe(.value, with: { snapshot in
             if snapshot.value as? Bool ?? false {
@@ -81,6 +83,27 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
                 self.connect = false
             }
         })
+    }
+    
+    func checkIsMaintanance() {
+        Firestore.firestore().collection("DBInfo").document("Maintenance").addSnapshotListener { [self]  querySnapshot, error in
+            guard let startTimeString = querySnapshot?.get("startTime") as? String else { return }
+            guard let endTimeString = querySnapshot?.get("endTime") as? String else { return }
+            guard let isMaintenance = querySnapshot?.get("isMaintenance") as? Bool else { return }
+            let formatter = ISO8601DateFormatter()
+            guard let startTime = formatter.date(from: startTimeString) else { return }
+            guard let endTime = formatter.date(from: endTimeString) else { return }
+            if isMaintenance {
+                dateFormatter.dateFormat = "MM/dd HH:mm"
+                dateFormatter.timeZone = .autoupdatingCurrent
+                dateFormatter.locale = .autoupdatingCurrent
+                let displayStartTimeString = dateFormatter.string(from: startTime)
+                let displayEndTimeString = dateFormatter.string(from: endTime)
+                let message = "\(displayStartTimeString)から\(displayEndTimeString)はメンテナンス中です。\nこれ以降に再度お試しください。\nなお、終了時刻は繰り上がる場合があります。"
+                let alert: UIAlertController = UIAlertController(title: "現在メンテナンス中です", message: message, preferredStyle: .alert)
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
     }
     
     func observeRealtimeDatabase() {
@@ -418,7 +441,7 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
                             let text = alertTextField.text!
                             self.listArray[indexPath.section].listName = text
                             self.ref.child("rooms").child(self.roomIdString).child("lists").child(listId).child("info").updateChildValues(["listName": text])
-                            GeneralPurpose.updateEditHistory(roomId: self.roomIdString)
+                            GeneralPurpose.updateEditHistory(roomId: self.roomIdString, listId: listId)
                         }}))
                     self.present(alert, animated: true, completion: nil)
                 }
@@ -507,9 +530,10 @@ class ListViewController: UIViewController, UITableViewDelegate, UITableViewData
                         self.dateFormatter.locale = Locale(identifier: "en_US_POSIX")
                         self.dateFormatter.timeZone = TimeZone(identifier: "UTC")
                         let date = self.dateFormatter.string(from: Date())
-                        GeneralPurpose.updateEditHistory(roomId: self.roomIdString)
                         let text = textField.text!
-                        self.ref.child("rooms").child(self.roomIdString).child("lists").child("list\(date)").child("info").updateChildValues(["listName": text, "listCount": -1])
+                        let listId = "list\(date)"
+                        self.ref.child("rooms").child(self.roomIdString).child("lists").child(listId).child("info").updateChildValues(["listName": text, "listCount": -1])
+                        GeneralPurpose.updateEditHistory(roomId: self.roomIdString, listId: listId)
                         textField.text = ""
                     }}))}
             self.present(alert, animated: true, completion: nil)

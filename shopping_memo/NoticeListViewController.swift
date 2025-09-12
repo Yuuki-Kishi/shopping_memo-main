@@ -6,6 +6,7 @@
 //
 import UIKit
 import FirebaseAuth
+import FirebaseDatabase
 import FirebaseFirestore
 
 class NoticeListViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
@@ -15,10 +16,15 @@ class NoticeListViewController: UIViewController, UITableViewDelegate, UITableVi
     
     var alertArray = [(alertId: String, alertTitle: String, alertMessage: String, content: String, creationTime: Date, isAlert: Bool, minVersion: Double, maxVersion: Double)]()
     var tappedIndex: Int!
+    var ref: DatabaseReference!
+    var userId: String!
+    let dateFormatter = DateFormatter()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         UISetUp()
+        updateNoticeCheckedTime()
+        checkIsMaintanance()
         setUpAndObserveRealtimeDatabase()
     }
     
@@ -31,6 +37,38 @@ class NoticeListViewController: UIViewController, UITableViewDelegate, UITableVi
         tableView.register(UINib(nibName: "NoticeListViewCell", bundle: nil), forCellReuseIdentifier: "NoticeListViewCell")
     }
     
+    func updateNoticeCheckedTime() {
+        userId = Auth.auth().currentUser?.uid
+        ref = Database.database().reference()
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyyMMddHHmmssSSS"
+        dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+        dateFormatter.timeZone = TimeZone(identifier: "UTC")
+        let now = dateFormatter.string(from: Date())
+        self.ref.child("users").child(userId).child("metadata").updateChildValues(["noticeCheckedTime": now])
+    }
+    
+    func checkIsMaintanance() {
+        Firestore.firestore().collection("DBInfo").document("Maintenance").addSnapshotListener { [self]  querySnapshot, error in
+            guard let startTimeString = querySnapshot?.get("startTime") as? String else { return }
+            guard let endTimeString = querySnapshot?.get("endTime") as? String else { return }
+            guard let isMaintenance = querySnapshot?.get("isMaintenance") as? Bool else { return }
+            let formatter = ISO8601DateFormatter()
+            guard let startTime = formatter.date(from: startTimeString) else { return }
+            guard let endTime = formatter.date(from: endTimeString) else { return }
+            if isMaintenance {
+                dateFormatter.dateFormat = "MM/dd HH:mm"
+                dateFormatter.timeZone = .autoupdatingCurrent
+                dateFormatter.locale = .autoupdatingCurrent
+                let displayStartTimeString = dateFormatter.string(from: startTime)
+                let displayEndTimeString = dateFormatter.string(from: endTime)
+                let message = "\(displayStartTimeString)から\(displayEndTimeString)はメンテナンス中です。\nこれ以降に再度お試しください。\nなお、終了時刻は繰り上がる場合があります。"
+                let alert: UIAlertController = UIAlertController(title: "現在メンテナンス中です", message: message, preferredStyle: .alert)
+                self.present(alert, animated: true, completion: nil)
+            }
+        }
+    }
+        
     func setUpAndObserveRealtimeDatabase() {
         GeneralPurpose.AIV(VC: self, view: view, status: "start")
         Firestore.firestore().collection("alerts").getDocuments { snapshot, error in
